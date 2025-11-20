@@ -1,0 +1,43 @@
+# macOS
+.DS_Store
+
+# Python bytecode/cache
+__pycache__/
+*.py[cod]
+*.so
+
+# Packaging / build artifacts
+dist/
+build/
+.eggs/
+*.egg
+*.egg-info/
+
+# Virtual environments
+.venv/
+venv/
+env/
+ENV/
+
+# Environment variable files
+.env
+.env.*
+
+# Jupyter Notebook checkpoints
+.ipynb_checkpoints/
+
+# Logs
+*.log
+
+# Coverage / test / type checking caches
+.coverage
+htmlcov/
+.pytest_cache/
+.mypy_cache/
+.cache/
+
+# Editor settings (uncomment if you prefer to commit)
+.vscode/
+
+# If you later add datasets or outputs you want ignored, append them below.
+episodic_memory.json

@@ -172,8 +172,11 @@ if __name__ == "__main__":
         result = bot.chat(user_in, image_path=img_path)
         
         state = result['internal_state']
-        conf = state.get('confidence', mx.array([0.0])).item()
-        ent = state.get('entropy', mx.array([0.0])).item()
+        conf_val = state.get('confidence', mx.array([0.0]))
+        conf = conf_val.item() if hasattr(conf_val, 'item') else conf_val
+        
+        ent_val = state.get('entropy', mx.array([0.0]))
+        ent = ent_val.item() if hasattr(ent_val, 'item') else ent_val
         
         print(f"🧠 Internal: Conf={conf:.2f} | Entropy={ent:.2f}")
         if result['thought_process']:

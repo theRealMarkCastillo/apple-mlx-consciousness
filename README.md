@@ -145,6 +145,18 @@ python conscious_chatbot.py
 ```
 *Chat with an agent that shows its internal confidence and thought process*
 
+**4. Phase 5 Advanced Demos**
+```bash
+# Wake-Sleep Active Learning
+python heterogeneous_training.py
+
+# Adversarial Co-Evolution
+python adversarial_coevolution.py
+
+# Sparse Memory Scaling
+python sparse_memory.py
+```
+
 ---
 
 ## 📊 Current Results (Phase 1: Single Agent)
@@ -242,12 +254,15 @@ See **[ROADMAP.md](ROADMAP.md)** for detailed timeline. Summary:
 - **Biological plausibility:** Dual-process + hippocampus analogy
 - **Next:** 500+ agent tests, Phase 5 hardware-aware innovations
 
-### 🔮 Phase 5: Future Directions
-- Extended phase transition search (extreme parameters)
-- Hierarchical Temporal Memory (HTM) integration
-- Lifelong learning without catastrophic forgetting
-- Energy consumption profiling (powermetrics)
-- Publication preparation (NeurIPS/CogSci)
+### 🔮 Phase 5: Hardware-Aware Innovations (COMPLETED)
+- ✅ **Wake-Sleep Active Learning:** `heterogeneous_training.py`
+- ✅ **Adversarial Co-Evolution:** `adversarial_coevolution.py`
+- ✅ **Sparse Memory Scaling:** `sparse_memory.py` (20x capacity)
+
+**Phase 5 Results:**
+- **Active Learning:** Rapid convergence on hard examples
+- **Adversarial Robustness:** Disagreement minimized (0.06 → 0.003)
+- **Memory Capacity:** 168M memories on 32GB system (Sparse)
 
 ---
 

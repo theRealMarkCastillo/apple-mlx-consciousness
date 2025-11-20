@@ -178,10 +178,9 @@ class System1(nn.Module):
         super().__init__()
         self.l1 = nn.Linear(input_dim, hidden_dim)
         self.l2 = nn.Linear(hidden_dim, output_dim)
-        self.activation = nn.ReLU()
 
     def __call__(self, x):
-        x = self.activation(self.l1(x))
+        x = nn.relu(self.l1(x))
         logits = self.l2(x)
         return logits
 
@@ -202,11 +201,9 @@ class System2(nn.Module):
         
         # Head 2: Goal Vector (for Top-Down Attention)
         self.l_goal = nn.Linear(hidden_dim, goal_dim)
-        
-        self.activation = nn.Tanh() 
 
     def __call__(self, x):
-        x = self.activation(self.l1(x))
+        x = mx.tanh(self.l1(x))
         
         # Confidence: 0 to 1
         score = mx.sigmoid(self.l_score(x))
@@ -227,13 +224,12 @@ class WorldModel(nn.Module):
         self.l1 = nn.Linear(state_dim + action_dim, hidden_dim)
         self.l2 = nn.Linear(hidden_dim, hidden_dim)
         self.l3 = nn.Linear(hidden_dim, state_dim)
-        self.activation = nn.ReLU()
 
     def __call__(self, state, action):
         # Concatenate State + Action
         x = mx.concatenate([state, action], axis=-1)
-        x = self.activation(self.l1(x))
-        x = self.activation(self.l2(x))
+        x = nn.relu(self.l1(x))
+        x = nn.relu(self.l2(x))
         next_state_pred = self.l3(x)
         return next_state_pred
 
@@ -322,7 +318,7 @@ class BicameralAgent:
             top_action_vec = mx.zeros((self.action_dim,))
             top_action_vec[top_action_idx] = 1.0
             
-            predicted_next_state = self.world_model(current_state, top_action_vec)
+            _ = self.world_model(current_state, top_action_vec)
             # If predicted state is "bad" (e.g. high entropy in future?), we might suppress.
             # For this demo, we just flag that we used imagination.
             imagination_used = True
@@ -368,8 +364,8 @@ class BicameralAgent:
             logits = model(x)
             ce_loss = nn.losses.cross_entropy(logits, target_action)
             return ce_loss * r
-
-        loss, grads = mx.value_and_grad(loss_fn)(self.system1, state, action_taken, reward)
+            
+        _, grads = mx.value_and_grad(loss_fn)(self.system1, state, action_taken, reward)
         self.optimizer.update(self.system1, grads)
 
     def dream(self, batch_size: int = 32, epochs: int = 5):
@@ -397,7 +393,7 @@ class BicameralAgent:
         states = mx.array([m['state'] for m in valid_batch])
         actions = mx.array([m['action'] for m in valid_batch])
         next_states = mx.array([m['next_state'] for m in valid_batch])
-        rewards = mx.array([m['reward'] for m in valid_batch])
+        # rewards = mx.array([m['reward'] for m in valid_batch]) # Unused
 
         # 1. Train World Model: Minimize MSE(Predicted_Next_State, Actual_Next_State)
         def wm_loss_fn(model, s, a, s_next):

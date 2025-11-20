@@ -304,6 +304,7 @@ class ConsciousSwarm:
             
         agent_states = []
         agent_actions = []
+        agent_confidences = []
         
         # === PHASE 1: Individual Processing ===
         for i, agent in enumerate(self.agents):
@@ -333,6 +334,10 @@ class ConsciousSwarm:
             
             agent_states.append(decision['state'])
             agent_actions.append(decision['action'])
+            
+            # Store confidence if available (default to 1.0 if not)
+            conf = decision.get('confidence', mx.array([1.0])).item()
+            agent_confidences.append(conf)
         
         # === PHASE 2: Collective Aggregation ===
         # Bottom-up: aggregate all agent states into collective consciousness
@@ -341,13 +346,13 @@ class ConsciousSwarm:
         # === PHASE 3: Communication (Optional, based on uncertainty) ===
         # Agents with low confidence broadcast for help
         for i, agent in enumerate(self.agents):
-            # Check last decision confidence
-            if hasattr(agent, 'last_confidence') and agent.last_confidence < 0.4:
+            # Check decision confidence
+            if agent_confidences[i] < 0.4:
                 # Broadcast uncertainty signal
                 self.communication.broadcast(
                     sender_id=i,
                     message=agent_states[i],
-                    metadata={'type': 'help_request', 'confidence': agent.last_confidence}
+                    metadata={'type': 'help_request', 'confidence': agent_confidences[i]}
                 )
         
         # === PHASE 4: Logging ===

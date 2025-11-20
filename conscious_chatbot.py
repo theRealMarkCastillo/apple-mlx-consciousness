@@ -1,14 +1,21 @@
 import mlx.core as mx
 from cognitive_architecture import BicameralAgent
+from heterogeneous_architecture import HeterogeneousAgent
+import math
 
 class ConsciousChatbot:
     """
     A chatbot powered by the Bicameral Agent architecture.
     It maintains an internal 'mental state' that evolves with the conversation.
     """
-    def __init__(self):
+    def __init__(self, use_heterogeneous: bool = False):
         # State dim 128, Action dim 3 (0: Chit-chat, 1: Fact, 2: Question)
-        self.agent = BicameralAgent(state_dim=128, action_dim=3)
+        self.use_heterogeneous = use_heterogeneous
+        if use_heterogeneous:
+            print("🚀 Initializing Heterogeneous Agent (NPU + GPU)...")
+            self.agent = HeterogeneousAgent(state_dim=128, action_dim=3)
+        else:
+            self.agent = BicameralAgent(state_dim=128, action_dim=3)
         
         # Simple vocabulary for demo purposes
         self.vocab = {
@@ -49,8 +56,18 @@ class ConsciousChatbot:
         
         # 3. Action / Response Generation
         action_idx = decision['action']
-        confidence = decision['confidence'].item()
-        memory_retrieved = decision['memory_retrieved']
+        
+        # Handle different agent return types
+        if self.use_heterogeneous:
+            # HeterogeneousAgent returns 'entropy' and 'used_system2'
+            entropy = decision['entropy']
+            # Approximate confidence from entropy (low entropy = high confidence)
+            confidence = math.exp(-entropy) 
+            memory_retrieved = decision['used_system2']
+        else:
+            # BicameralAgent returns 'confidence' and 'memory_retrieved'
+            confidence = decision['confidence'].item()
+            memory_retrieved = decision['memory_retrieved']
         
         # Select response based on action category
         import random
@@ -61,11 +78,18 @@ class ConsciousChatbot:
         thought_process = ""
         
         if memory_retrieved:
-            thought_process = "(Thinking: I am unsure... recalling past conversations...)"
+            if self.use_heterogeneous:
+                thought_process = "(System 2 [GPU] Activated: Deliberating...)"
+            else:
+                thought_process = "(Thinking: I am unsure... recalling past conversations...)"
             final_response = f"Hmm, let me think... {base_response.lower()}"
         elif confidence > 0.9:
             thought_process = "(Thinking: I am very confident!)"
             final_response = f"Absolutely! {base_response}"
+            
+        # Ensure decision has confidence for the main loop to print
+        if 'confidence' not in decision:
+            decision['confidence'] = mx.array([confidence])
             
         return {
             "response": final_response,

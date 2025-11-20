@@ -1,7 +1,6 @@
 import mlx.core as mx
 import numpy as np
 import time
-import matplotlib.pyplot as plt
 
 class SparseMemory:
     """
@@ -19,7 +18,7 @@ class SparseMemory:
         self.sparsity = sparsity
         self.active_elements = int(dim * (1 - sparsity))
         
-        print(f"🧠 Initializing Sparse Memory System")
+        print("🧠 Initializing Sparse Memory System")
         print(f"   Capacity: {capacity:,} memories")
         print(f"   Dimension: {dim}")
         print(f"   Sparsity: {sparsity*100:.1f}% ({self.active_elements} active neurons)")
@@ -113,13 +112,13 @@ def benchmark_sparse_vs_dense():
     dense_capacity = (memory_budget_gb * 1024**3) / (dim * 4)
     sparse_capacity = (memory_budget_gb * 1024**3) / (active * 4)
     
-    print(f"\n🚀 CAPACITY PROJECTION (32GB Budget):")
+    print("\n🚀 CAPACITY PROJECTION (32GB Budget):")
     print(f"   Dense Capacity:  {int(dense_capacity):,} memories")
     print(f"   Sparse Capacity: {int(sparse_capacity):,} memories")
     print(f"   Gain:            +{int(sparse_capacity - dense_capacity):,} memories")
 
     # Retrieval Simulation
-    print(f"\n⚡ RETRIEVAL SIMULATION")
+    print("\n⚡ RETRIEVAL SIMULATION")
     mem = SparseMemory(capacity=10000, dim=128, sparsity=0.90)
     
     # Fill memory

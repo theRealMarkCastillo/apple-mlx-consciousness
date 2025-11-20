@@ -46,6 +46,10 @@ class QuantizedSystem1(nn.Module):
         self.quantization_bits = 8
         self.quantization_group_size = 32  # Must divide hidden_dim
         
+        # Initialize quantized weights containers
+        self.l1_q = None
+        self.l2_q = None
+        
     def __call__(self, x: mx.array) -> mx.array:
         """Fast forward pass (quantized if enabled)."""
         x = mx.tanh(self.l1(x))
@@ -197,9 +201,9 @@ class HeterogeneousAgent:
         self.system2_calls = 0
         self.sleep_cycles = 0
         
-        print(f"\n🧠 Heterogeneous Agent Initialized")
+        print("\n🧠 Heterogeneous Agent Initialized")
         print(f"   System 1: {'Quantized (NPU-ready)' if use_quantization else 'Full Precision'}")
-        print(f"   System 2: Full Precision (GPU)")
+        print("   System 2: Full Precision (GPU)")
         print(f"   State Dim: {state_dim}D")
         print(f"   Action Dim: {action_dim}")
     
@@ -348,7 +352,7 @@ class HeterogeneousAgent:
         print(f"   Consolidated: {consolidated_count} experiences")
         print(f"   Loss: {initial_loss:.4f} -> {final_loss:.4f}")
         print(f"   Time: {elapsed:.3f}s")
-        print(f"   Mode: Offline (GPU full precision training -> NPU quantization)")
+        print("   Mode: Offline (GPU full precision training -> NPU quantization)")
         
         return {
             'consolidated': consolidated_count,
@@ -369,7 +373,7 @@ class HeterogeneousAgent:
         }
 
 
-def benchmark_multi_agent_scaling(agent_counts: List[int] = [10, 50, 100, 200]) -> List[Dict]:
+def benchmark_multi_agent_scaling(agent_counts: Optional[List[int]] = None) -> List[Dict]:
     """
     Demonstrate the memory capacity advantage of quantization.
     
@@ -377,6 +381,9 @@ def benchmark_multi_agent_scaling(agent_counts: List[int] = [10, 50, 100, 200]) 
     - Full precision: Limited to ~100-200 agents
     - Quantized: Can fit 3.2x more agents (320-640 agents)
     """
+    if agent_counts is None:
+        agent_counts = [10, 50, 100, 200]
+        
     print("\n" + "="*70)
     print("🏁 MULTI-AGENT SCALING BENCHMARK")
     print("="*70)
@@ -398,20 +405,20 @@ def benchmark_multi_agent_scaling(agent_counts: List[int] = [10, 50, 100, 200]) 
         memory_quantized = num_agents * system1_quantized_bytes / 1024 / 1024  # MB
         memory_full = num_agents * system1_full_bytes / 1024 / 1024  # MB
         
-        print(f"\nMemory Usage:")
+        print("\nMemory Usage:")
         print(f"   Quantized: {memory_quantized:.2f} MB ({num_agents} agents)")
         print(f"   Full Precision: {memory_full:.2f} MB (hypothetical)")
         print(f"   Savings: {memory_full - memory_quantized:.2f} MB")
         
         # Run quick test with all agents
-        print(f"\nRunning 100-step test...")
+        print("\nRunning 100-step test...")
         agents = [HeterogeneousAgent(use_quantization=True) for _ in range(num_agents)]
         
         start = time.time()
-        for step in range(100):
+        for _ in range(100):
             for agent in agents:
                 sensory = mx.random.normal((128,))
-                result = agent.step(sensory)
+                agent.step(sensory)
         elapsed = time.time() - start
         
         agent_steps_per_sec = (num_agents * 100) / elapsed
@@ -440,7 +447,7 @@ def benchmark_multi_agent_scaling(agent_counts: List[int] = [10, 50, 100, 200]) 
     max_agents_full = int(64 * 1024 / system1_full_bytes * 1024)  # 64GB capacity
     max_agents_quantized = int(64 * 1024 / system1_quantized_bytes * 1024)
     
-    print(f"\n💡 CAPACITY PROJECTION (64GB unified memory):")
+    print("\n💡 CAPACITY PROJECTION (64GB unified memory):")
     print(f"   Full Precision: ~{max_agents_full:,} agents")
     print(f"   Quantized: ~{max_agents_quantized:,} agents")
     print(f"   Capacity Increase: {max_agents_quantized/max_agents_full:.1f}x")
@@ -474,7 +481,7 @@ def benchmark_heterogeneous_vs_baseline(num_steps: int = 1000) -> Dict:
     start = time.time()
     for i in range(num_steps):
         sensory = mx.random.normal((128,))
-        result = agent_quantized.step(sensory)
+        agent_quantized.step(sensory)
         if (i + 1) % 200 == 0:
             print(f"      Step {i+1}/{num_steps}")
     quantized_time = time.time() - start
@@ -484,7 +491,7 @@ def benchmark_heterogeneous_vs_baseline(num_steps: int = 1000) -> Dict:
     start = time.time()
     for i in range(num_steps):
         sensory = mx.random.normal((128,))
-        result = agent_baseline.step(sensory)
+        agent_baseline.step(sensory)
         if (i + 1) % 200 == 0:
             print(f"      Step {i+1}/{num_steps}")
     baseline_time = time.time() - start
@@ -498,13 +505,13 @@ def benchmark_heterogeneous_vs_baseline(num_steps: int = 1000) -> Dict:
     print("📊 BENCHMARK RESULTS")
     print("="*70)
     
-    print(f"\nQuantized Agent (NPU-optimized):")
+    print("\nQuantized Agent (NPU-optimized):")
     print(f"   Total time: {quantized_time:.3f}s")
     print(f"   Avg inference: {stats_q['avg_inference_time']*1000:.3f}ms")
     print(f"   Steps/sec: {num_steps/quantized_time:.1f}")
     print(f"   System 2 usage: {stats_q['system2_usage']*100:.1f}%")
     
-    print(f"\nBaseline Agent (Full Precision):")
+    print("\nBaseline Agent (Full Precision):")
     print(f"   Total time: {baseline_time:.3f}s")
     print(f"   Avg inference: {stats_b['avg_inference_time']*1000:.3f}ms")
     print(f"   Steps/sec: {num_steps/baseline_time:.1f}")
@@ -513,7 +520,7 @@ def benchmark_heterogeneous_vs_baseline(num_steps: int = 1000) -> Dict:
     speedup = baseline_time / quantized_time
     if speedup < 1.0:
         print(f"\n⚠️  OVERHEAD: {1/speedup:.2f}x slower (dequantization cost)")
-        print(f"   Note: Real advantage is 3.2x memory capacity increase")
+        print("   Note: Real advantage is 3.2x memory capacity increase")
     else:
         print(f"\n🚀 SPEEDUP: {speedup:.2f}x")
     
@@ -551,7 +558,7 @@ def demo_online_offline_learning(num_steps: int = 200, sleep_interval: int = 50)
         sensory = mx.random.normal((128,))
         reward = float(np.random.randn())
         
-        result = agent.step(sensory, reward=reward)
+        agent.step(sensory, reward=reward)
         
         # Sleep periodically
         if (step + 1) % sleep_interval == 0:

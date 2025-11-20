@@ -40,12 +40,12 @@ def run_training_comparison(num_steps=500, sleep_interval=50):
             
         # Generate a target action (synthetic ground truth)
         # Simple rule: action depends on first dimension sign
-        target_action = 1 if sensory[0].item() > 0 else 0
+        # target_action = 1 if sensory[0].item() > 0 else 0 # Unused
         reward = 1.0  # Simplified reward
         
         # Step both agents
-        res_std = agent_standard.step(sensory, reward)
-        res_sel = agent_selective.step(sensory, reward)
+        agent_standard.step(sensory, reward)
+        agent_selective.step(sensory, reward)
         
         # Sleep cycle
         if (step + 1) % sleep_interval == 0:
@@ -73,15 +73,15 @@ def run_training_comparison(num_steps=500, sleep_interval=50):
     
     return history_standard, history_selective
 
-def plot_results(h_std, h_sel):
+def plot_results(hist_std, hist_sel):
     """Visualize the comparison."""
-    epochs = range(len(h_std['loss']))
+    epochs = range(len(hist_std['loss']))
     
-    fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(12, 5))
+    _, (ax1, ax2) = plt.subplots(1, 2, figsize=(12, 5))
     
     # Loss Comparison
-    ax1.plot(epochs, h_std['loss'], 'o-', label='Standard (Full Buffer)')
-    ax1.plot(epochs, h_sel['loss'], 's-', label='Selective (Hard Examples)')
+    ax1.plot(epochs, hist_std['loss'], 'o-', label='Standard (Full Buffer)')
+    ax1.plot(epochs, hist_sel['loss'], 's-', label='Selective (Hard Examples)')
     ax1.set_title('Training Loss during Sleep')
     ax1.set_xlabel('Sleep Cycle')
     ax1.set_ylabel('Loss')
@@ -89,8 +89,8 @@ def plot_results(h_std, h_sel):
     ax1.grid(True, alpha=0.3)
     
     # System 2 Usage Comparison
-    ax2.plot(epochs, h_std['sys2_usage'], 'o-', label='Standard')
-    ax2.plot(epochs, h_sel['sys2_usage'], 's-', label='Selective')
+    ax2.plot(epochs, hist_std['sys2_usage'], 'o-', label='Standard')
+    ax2.plot(epochs, hist_sel['sys2_usage'], 's-', label='Selective')
     ax2.set_title('System 2 Usage (Dependency)')
     ax2.set_xlabel('Sleep Cycle')
     ax2.set_ylabel('Usage Ratio')

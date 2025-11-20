@@ -1,10 +1,8 @@
 import mlx.core as mx
 import mlx.nn as nn
 import mlx.optimizers as optim
-import numpy as np
 import matplotlib.pyplot as plt
 from heterogeneous_architecture import HeterogeneousAgent
-import time
 
 class AdversarialEvolution:
     """
@@ -131,7 +129,7 @@ class AdversarialEvolution:
         return disagreements, losses
 
 def plot_evolution(disagreements, losses):
-    fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(12, 5))
+    _, (ax1, ax2) = plt.subplots(1, 2, figsize=(12, 5))
     
     ax1.plot(disagreements, 'r-o', linewidth=2)
     ax1.set_title('System Disagreement (Adversarial Robustness)')

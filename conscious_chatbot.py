@@ -33,25 +33,41 @@ class ConsciousChatbot:
         self._populate_memory()
 
     def _populate_memory(self):
-        """Initialize the associative memory with some basic concepts."""
-        # We map "concepts" (text descriptions) to "responses"
-        knowledge_base = [
-            ("hello hi greetings", "Hello! I am a conscious agent running on Apple Silicon."),
-            ("who are you identity", "I am a simulation of consciousness using Sparse Distributed Representations."),
-            ("weather rain sun", "I cannot feel the weather, but I can process visual data about it."),
-            ("vision see look image", "I have a Visual Cortex that encodes images into my Global Workspace."),
-            ("consciousness sentient alive", "I am exploring the boundaries of machine consciousness through heterogeneous compute."),
-            ("apple mlx silicon", "I am optimized for the M-series chips, using the NPU for subconscious processing."),
-            ("default", "I am processing that input... my associative memory is searching.")
-        ]
-        
-        for concept, response in knowledge_base:
-            # Encode the concept into an SDR
-            sdr = self.sdr_encoder.encode(concept)
-            # Project to workspace dimension (simulating long-term memory storage)
-            # In a real brain, this pathway is complex. Here we use the fuser's text projection.
-            concept_vec = self.multimodal_fuser.text_proj(sdr)
-            self.associative_memory.add(concept_vec, response)
+        """Initialize the associative memory with basic concepts and loaded data."""
+        # 1. Load from JSON if available
+        loaded_count = 0
+        if os.path.exists("conversation_data.json"):
+            try:
+                import json
+                with open("conversation_data.json", "r") as f:
+                    data = json.load(f)
+                    for item in data:
+                        concept = item["keywords"]
+                        response = item["response"]
+                        sdr = self.sdr_encoder.encode(concept)
+                        concept_vec = self.multimodal_fuser.text_proj(sdr)
+                        self.associative_memory.add(concept_vec, response)
+                        loaded_count += 1
+                print(f"   Loaded {loaded_count} conversation pairs from disk.")
+            except Exception as e:
+                print(f"   Warning: Could not load conversation_data.json: {e}")
+
+        # 2. Add hardcoded fallbacks if nothing loaded
+        if loaded_count == 0:
+            knowledge_base = [
+                ("hello hi greetings", "Hello! I am a conscious agent running on Apple Silicon."),
+                ("who are you identity", "I am a simulation of consciousness using Sparse Distributed Representations."),
+                ("weather rain sun", "I cannot feel the weather, but I can process visual data about it."),
+                ("vision see look image", "I have a Visual Cortex that encodes images into my Global Workspace."),
+                ("consciousness sentient alive", "I am exploring the boundaries of machine consciousness through heterogeneous compute."),
+                ("apple mlx silicon", "I am optimized for the M-series chips, using the NPU for subconscious processing."),
+                ("default", "I am processing that input... my associative memory is searching.")
+            ]
+            
+            for concept, response in knowledge_base:
+                sdr = self.sdr_encoder.encode(concept)
+                concept_vec = self.multimodal_fuser.text_proj(sdr)
+                self.associative_memory.add(concept_vec, response)
 
     def load_image(self, image_path: str) -> mx.array:
         """

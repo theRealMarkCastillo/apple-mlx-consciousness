@@ -30,19 +30,19 @@ class EpisodicMemory:
             "reward": reward,
             "next_state": next_state.tolist() if next_state is not None else None
         }
+        
+        # Check for dimension mismatch BEFORE appending
+        if self.memory_matrix is not None and self.memory_matrix.shape[1] != state.shape[0]:
+            print(f"⚠️  Memory dimension mismatch ({self.memory_matrix.shape[1]} -> {state.shape[0]}). Clearing old memories.")
+            self.memories = []
+            self.memory_matrix = None
+        
+        # Now append consistently
         self.memories.append(episode)
         
-        # Update GPU memory matrix
-        if self.memory_matrix is None:
-            self.memory_matrix = state[None, :]
-        else:
-            # Dimension mismatch check - clear old memories if incompatible
-            if self.memory_matrix.shape[1] != state.shape[0]:
-                print(f"⚠️  Memory dimension mismatch ({self.memory_matrix.shape[1]} -> {state.shape[0]}). Clearing old memories.")
-                self.memories = [episode]
-                self.memory_matrix = state[None, :]
-            else:
-                self.memory_matrix = mx.concatenate([self.memory_matrix, state[None, :]], axis=0)
+        # Update GPU memory matrix - always rebuild to avoid concatenation bugs
+        states = [mx.array(m["state"]) for m in self.memories]
+        self.memory_matrix = mx.stack(states) if states else None
 
         # Auto-save every 10 memories for persistence during debug
         if len(self.memories) % 10 == 0:
@@ -54,6 +54,19 @@ class EpisodicMemory:
         Uses vectorized GPU operations for speed.
         """
         if not self.memories or self.memory_matrix is None:
+            return []
+        
+        # Ensure consistency between memories list and matrix
+        actual_memory_count = len(self.memories)
+        matrix_rows = self.memory_matrix.shape[0]
+        
+        if actual_memory_count != matrix_rows:
+            print(f"⚠️  Memory sync issue: {actual_memory_count} memories but {matrix_rows} matrix rows. Rebuilding matrix...")
+            self.memory_matrix = mx.stack([mx.array(m['state']) for m in self.memories])
+        
+        # Limit k to available memories
+        k = min(k, len(self.memories))
+        if k == 0:
             return []
 
         # Vectorized Cosine Similarity on GPU

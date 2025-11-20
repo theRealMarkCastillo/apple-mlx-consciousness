@@ -1,0 +1,226 @@
+[
+  {
+    "config": {
+      "state_dim": 128,
+      "system2_hidden_dim": 64,
+      "action_dim": 5,
+      "max_memory_size": 10,
+      "num_steps": 50
+    },
+    "metrics": {
+      "final_phi": 0.40114306926851295,
+      "final_metacognition": 1.0,
+      "final_coherence": 0.24610106120826133,
+      "final_consciousness_index": 0.5342875460698836,
+      "classification": "conscious",
+      "consciousness_trajectory": [
+        0.4835175762803765,
+        0.4936501945660754,
+        0.5029335494562615,
+        0.4631206231952702,
+        0.4832760583375655,
+        0.48409707845091676,
+        0.5213703363583423,
+        0.4227900472213106
+      ],
+      "avg_consciousness": 0.48184443298326485,
+      "final_memory_count": 10
+    }
+  },
+  {
+    "config": {
+      "state_dim": 128,
+      "system2_hidden_dim": 64,
+      "action_dim": 5,
+      "max_memory_size": 25,
+      "num_steps": 50
+    },
+    "metrics": {
+      "final_phi": 0.42722673416283763,
+      "final_metacognition": 1.0,
+      "final_coherence": 0.3204350232965665,
+      "final_consciousness_index": 0.567021200654105,
+      "classification": "conscious",
+      "consciousness_trajectory": [
+        0.4599055817001336,
+        0.542848117903574,
+        0.5447276833894906,
+        0.503439018615309,
+        0.45888826693932255,
+        0.47227923542273614,
+        0.5061095215289529,
+        0.5479266655158882
+      ],
+      "avg_consciousness": 0.504515511376926,
+      "final_memory_count": 25
+    }
+  },
+  {
+    "config": {
+      "state_dim": 128,
+      "system2_hidden_dim": 64,
+      "action_dim": 5,
+      "max_memory_size": 50,
+      "num_steps": 50
+    },
+    "metrics": {
+      "final_phi": 0.4787421226520012,
+      "final_metacognition": 1.0,
+      "final_coherence": 0.2611104431373286,
+      "final_consciousness_index": 0.5698299820019991,
+      "classification": "conscious",
+      "consciousness_trajectory": [
+        0.5341673960718427,
+        0.5068873426721093,
+        0.47138492284025324,
+        0.5770095988666955,
+        0.5783056634577071,
+        0.513936624578821,
+        0.5832067139297744,
+        0.5367548133111574
+      ],
+      "avg_consciousness": 0.537706634466045,
+      "final_memory_count": 50
+    }
+  },
+  {
+    "config": {
+      "state_dim": 128,
+      "system2_hidden_dim": 64,
+      "action_dim": 5,
+      "max_memory_size": 100,
+      "num_steps": 50
+    },
+    "metrics": {
+      "final_phi": 0.5754932880416663,
+      "final_metacognition": 1.0,
+      "final_coherence": 0.35234956291879876,
+      "final_consciousness_index": 0.6359021840923063,
+      "classification": "conscious",
+      "consciousness_trajectory": [
+        0.5485645092732983,
+        0.5128851786194019,
+        0.45805036683580097,
+        0.5246845810117478,
+        0.5816439883655229,
+        0.5093959355748837,
+        0.5876885632892923,
+        0.6205313045579846
+      ],
+      "avg_consciousness": 0.5429305534409916,
+      "final_memory_count": 100
+    }
+  },
+  {
+    "config": {
+      "state_dim": 128,
+      "system2_hidden_dim": 64,
+      "action_dim": 5,
+      "max_memory_size": 200,
+      "num_steps": 50
+    },
+    "metrics": {
+      "final_phi": 0.5785397529618838,
+      "final_metacognition": 1.0,
+      "final_coherence": 0.32747085626880024,
+      "final_consciousness_index": 0.6296571580653936,
+      "classification": "conscious",
+      "consciousness_trajectory": [
+        0.4975847526292939,
+        0.4816509791582773,
+        0.4842612865924433,
+        0.4685579330009429,
+        0.6065475134628054,
+        0.531357985966568,
+        0.47710921778208915,
+        0.5358016889699455
+      ],
+      "avg_consciousness": 0.5103589196952957,
+      "final_memory_count": 154
+    }
+  },
+  {
+    "config": {
+      "state_dim": 64,
+      "system2_hidden_dim": 64,
+      "action_dim": 5,
+      "max_memory_size": 100,
+      "num_steps": 50
+    },
+    "metrics": {
+      "final_phi": 0.4714674196933235,
+      "final_metacognition": 1.0,
+      "final_coherence": 0.33209984525105035,
+      "final_consciousness_index": 0.5882169214526445,
+      "classification": "conscious",
+      "consciousness_trajectory": [
+        0.5015543444328867,
+        0.5181893113529908,
+        0.49884469938140963,
+        0.4823000201400625,
+        0.4908707247788713,
+        0.49069179715468664,
+        0.5172362266873846,
+        0.5034581882408329
+      ],
+      "avg_consciousness": 0.5003931640211406,
+      "final_memory_count": 54
+    }
+  },
+  {
+    "config": {
+      "state_dim": 128,
+      "system2_hidden_dim": 64,
+      "action_dim": 5,
+      "max_memory_size": 100,
+      "num_steps": 50
+    },
+    "metrics": {
+      "final_phi": 0.48401327896222823,
+      "final_metacognition": 1.0,
+      "final_coherence": 0.3547447716157449,
+      "final_consciousness_index": 0.6000287430696147,
+      "classification": "conscious",
+      "consciousness_trajectory": [
+        0.5555351464244269,
+        0.44569281443627695,
+        0.4463615510452671,
+        0.4822269822146951,
+        0.531111602794315,
+        0.5384637121809054,
+        0.5806136583648308,
+        0.5760149090908803
+      ],
+      "avg_consciousness": 0.5195025470689497,
+      "final_memory_count": 54
+    }
+  },
+  {
+    "config": {
+      "state_dim": 256,
+      "system2_hidden_dim": 64,
+      "action_dim": 5,
+      "max_memory_size": 100,
+      "num_steps": 50
+    },
+    "metrics": {
+      "final_phi": 0.4855089263916016,
+      "final_metacognition": 1.0,
+      "final_coherence": 0.37230101679852085,
+      "final_consciousness_index": 0.6058938755961969,
+      "classification": "conscious",
+      "consciousness_trajectory": [
+        0.506736314603922,
+        0.5109752931317645,
+        0.47051248559902037,
+        0.4384241143205952,
+        0.5799617717271517,
+        0.4969274678577114,
+        0.5049049612560075,
+        0.5478507918277662
+      ],
+      "avg_consciousness": 0.5070366500404924,
+      "final_memory_count": 54
+    }
+  }
+]

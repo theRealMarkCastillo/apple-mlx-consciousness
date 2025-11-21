@@ -164,7 +164,7 @@ def run_visual_simulation(use_pretrained=True, enable_learning=True):
         agent.load_brain("agent_brain.npz")
     
     # Setup Plot
-    plt.style.use('dark_background')
+    plt.style.use('default') # Switch to white background
     fig = plt.figure(figsize=(18, 9))
     gs = gridspec.GridSpec(2, 2, width_ratios=[1, 1.5], height_ratios=[1, 1])
     
@@ -173,52 +173,66 @@ def run_visual_simulation(use_pretrained=True, enable_learning=True):
     ax_grid.set_title("Heterogeneous Agent (System 1 vs System 2)")
     ax_grid.set_xlim(-1, env.size)
     ax_grid.set_ylim(-1, env.size)
-    ax_grid.grid(True, alpha=0.2)
+    ax_grid.grid(True, alpha=0.2, color='black')
     
     # Grid Elements
-    res_scatter = ax_grid.scatter([], [], c='lime', marker='*', s=200, label='Resource', zorder=2)
+    res_scatter = ax_grid.scatter([], [], c='green', marker='*', s=200, label='Resource', zorder=2)
     trap_scatter = ax_grid.scatter([], [], c='red', marker='x', s=150, label='Trap', zorder=2)
     agent_dot = ax_grid.scatter([], [], c='blue', s=300, label='System 1 (NPU)', zorder=5)
+    
+    # Dummy handles for legend
+    from matplotlib.lines import Line2D
+    legend_elements = [
+        Line2D([0], [0], marker='o', color='w', markerfacecolor='blue', markersize=10, label='System 1 (Fast)'),
+        Line2D([0], [0], marker='o', color='w', markerfacecolor='orange', markersize=10, label='System 2 (Slow)'),
+        Line2D([0], [0], marker='*', color='w', markerfacecolor='green', markersize=15, label='Resource'),
+        Line2D([0], [0], marker='x', color='red', markersize=10, linestyle='None', markeredgewidth=2, label='Trap')
+    ]
     
     # 🧠 MEMORY VISUALIZATION ELEMENTS
     # Hippocampal memory trace (fading dots)
     memory_scatter = ax_grid.scatter([], [], c=[], s=100, alpha=0.8, marker='o', zorder=1)
     # Sleep replay lines (connections during consolidation)
-    dream_lines, = ax_grid.plot([], [], c='gold', alpha=0.6, linewidth=2, linestyle='--', zorder=1)
+    dream_lines, = ax_grid.plot([], [], c='orange', alpha=0.6, linewidth=2, linestyle='--', zorder=1)
     
     # Legend (Moved outside)
-    ax_grid.legend(loc='upper center', bbox_to_anchor=(0.5, -0.05), ncol=2)
+    ax_grid.legend(handles=legend_elements, loc='upper center', bbox_to_anchor=(0.5, -0.05), ncol=2)
 
     # Panel 2: Cognitive State (Entropy)
     ax_cog = fig.add_subplot(gs[0, 1])
-    ax_cog.set_title("Cognitive State (Uncertainty)")
-    ax_cog.set_ylim(0, 2.5)
+    ax_cog.set_title("Cognitive State")
+    ax_cog.set_ylim(0, 2.7)
     ax_cog.set_xlim(0, 50)
-    ax_cog.grid(True, alpha=0.2)
+    ax_cog.grid(True, alpha=0.2, color='black')
     
-    line_entropy, = ax_cog.plot([], [], 'purple', linewidth=2, label='Entropy')
-    fill_sys2 = ax_cog.fill_between([], [], color='orange', alpha=0.3, label='System 2 Active')
-    ax_cog.set_ylabel("Entropy (bits)")
-    ax_cog.legend(loc='upper right')
+    # Add threshold line and background
+    ax_cog.axhline(y=1.5, color='salmon', linestyle='--', alpha=0.8, label='Threshold (1.5)')
+    ax_cog.fill_between([0, 50], 1.5, 2.7, color='orange', alpha=0.2)
+    
+    line_entropy, = ax_cog.plot([], [], 'purple', linewidth=2, marker='.', label='Entropy')
+    fill_sys2 = ax_cog.fill_between([], [], color='orange', alpha=0.0) # Hidden, using static background instead
+    ax_cog.set_ylabel("Entropy")
+    ax_cog.set_xlabel("Steps (last 50)")
+    ax_cog.legend(loc='upper left')
     
     # Panel 3: Internal Dynamics
     ax_internal = fig.add_subplot(gs[1, 1])
-    ax_internal.set_title("Internal Dynamics (Workspace & Confidence)")
+    ax_internal.set_title("Internal State Dynamics")
     ax_internal.set_ylim(0, 1.1)
     ax_internal.set_xlim(0, 50)
-    ax_internal.grid(True, alpha=0.2)
+    ax_internal.grid(True, alpha=0.2, color='black')
     
-    line_workspace, = ax_internal.plot([], [], 'cyan', linewidth=1.5, label='Workspace Activity')
-    line_confidence, = ax_internal.plot([], [], 'lime', linewidth=1.5, label='Confidence')
-    fill_confidence = ax_internal.fill_between([], [], color='lime', alpha=0.1)
-    ax_internal.set_xlabel("Time (Recent Steps)")
-    ax_internal.set_ylabel("Activation Level")
+    line_workspace, = ax_internal.plot([], [], 'cyan', linewidth=2, label='Workspace Activity')
+    line_confidence, = ax_internal.plot([], [], 'lime', linewidth=2, label='Confidence')
+    fill_confidence = ax_internal.fill_between([], [], color='lime', alpha=0.0) # Removed fill to match clean look
+    ax_internal.set_xlabel("Time Steps (last 50)")
+    ax_internal.set_ylabel("Activity / Confidence")
     ax_internal.legend(loc='upper right')
     
     # Text Info
-    info_text = ax_internal.text(0.02, 0.95, "", transform=ax_internal.transAxes, 
-                                color='white', fontsize=10, verticalalignment='top',
-                                bbox=dict(facecolor='black', alpha=0.5))
+    info_text = ax_internal.text(0.02, 0.98, "", transform=ax_internal.transAxes, 
+                                color='black', fontsize=10, verticalalignment='top',
+                                bbox=dict(facecolor='white', alpha=0.8, edgecolor='gray'))
 
     # Data Storage
     history = {
@@ -232,7 +246,14 @@ def run_visual_simulation(use_pretrained=True, enable_learning=True):
     # List of dicts: {'pos': [x,y], 'type': 'good'/'bad', 'alpha': 1.0}
     memories = [] 
     
-    state = {'step': 0, 'total_reward': 0.0, 'last_pos': None, 'stuck_count': 0}
+    # State tracking
+    state = {
+        'step': 0, 
+        'total_reward': 0.0, 
+        'last_pos': None, 
+        'stuck_count': 0,
+        'pos_history': [] # For loop detection
+    }
 
     def init():
         return agent_dot, res_scatter, trap_scatter, memory_scatter, dream_lines, line_entropy, fill_sys2, line_workspace, line_confidence, fill_confidence, info_text
@@ -241,35 +262,17 @@ def run_visual_simulation(use_pretrained=True, enable_learning=True):
         # 1. Get Observation
         obs = env.get_observation(noise_level=0.3) # Add noise to make it interesting
         
-        # Check if stuck (Agent hasn't moved for 10 frames)
-        current_pos = list(env.agent_pos)
-        if state['last_pos'] == current_pos:
-            state['stuck_count'] += 1
-        else:
-            state['stuck_count'] = 0
-        state['last_pos'] = current_pos
-        
-        force_random = False
-        if state['stuck_count'] > 10:
-            force_random = True
-        
         # 2. Agent Step
         result = agent.step(obs)
         action = result['action']
         entropy = result['entropy']
         used_sys2 = result['used_system2']
         probs = result['action_probs']
+        boredom = result.get('boredom', 0.0)
         
         # Safety: Check for NaNs
         if np.isnan(probs).any():
-            force_random = True
-            
-        # Force exploration if stuck
-        if force_random:
             action = np.random.randint(0, 4)
-            # Update the buffer so we learn from the forced move (correct off-policy data)
-            if enable_learning and agent.online_buffer:
-                agent.online_buffer[-1]['action'] = action
         
         # 3. Environment Step
         reward = env.step(action)
@@ -329,7 +332,7 @@ def run_visual_simulation(use_pretrained=True, enable_learning=True):
             fig.canvas.flush_events()
             
             # Perform Sleep (Consolidation)
-            stats = agent.sleep(epochs=15) # Moderate sleep for demo
+            stats = agent.sleep(epochs=5) # Moderate sleep for demo
             
             # Clear memories (transferred to cortex)
             memories.clear()
@@ -339,12 +342,15 @@ def run_visual_simulation(use_pretrained=True, enable_learning=True):
         else:
             # Normal Title
             mode = "🧠 SYS2 (GPU)" if used_sys2 else "⚡ SYS1 (NPU)"
-            ax_grid.set_title(f"Step: {state['step']} | Reward: {reward:.2f} | Total: {state['total_reward']:.1f} | {mode}")
+            title_text = f"Step: {state['step']} | Reward: {reward:.2f} | Total: {state['total_reward']:.1f} | {mode}"
+            if boredom > 0.5:
+                title_text += " | 🥱 BORED (Metacognition)"
+            ax_grid.set_title(title_text)
 
         # Update Visuals
         agent_dot.set_offsets([env.agent_pos])
         agent_dot.set_color('orange' if used_sys2 else 'blue')
-        agent_dot.set_label('System 2 (GPU)' if used_sys2 else 'System 1 (NPU)')
+        # No label update needed as we use static legend
         
         res_scatter.set_offsets(env.resources)
         trap_scatter.set_offsets(env.traps)

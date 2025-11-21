@@ -186,12 +186,16 @@ class HeterogeneousAgent:
         # Global Workspace
         self.workspace = mx.zeros(state_dim)
         
+        # Metacognition: Boredom/Frustration tracking
+        self.recent_states = [] # Short-term memory for loop detection
+        self.boredom_level = 0.0
+        
         # Online learning buffer (hippocampus-like)
         self.online_buffer = []
-        self.max_online_buffer = 200
+        self.max_online_buffer = 500
         
         # Optimizer for sleep consolidation
-        self.optimizer = optim.Adam(learning_rate=0.005)
+        self.optimizer = optim.Adam(learning_rate=0.001)
         
         # Quantize System 1 if enabled
         if use_quantization:
@@ -239,13 +243,39 @@ class HeterogeneousAgent:
         entropy = mx.abs(entropy)  # Ensure positive
         uncertainty_threshold = 1.5
         
-        # System 2: Deliberate reasoning if uncertain (GPU)
+        # --- METACOGNITION: Boredom/Loop Detection ---
+        # Check if current state is very similar to recent states
+        current_state_sig = tuple(np.round(self.workspace.tolist()[:2], 2)) # Use position (first 2 dims)
+        self.recent_states.append(current_state_sig)
+        if len(self.recent_states) > 20:
+            self.recent_states.pop(0)
+            
+        # Calculate boredom: How repetitive is the history?
+        unique_states = len(set(self.recent_states))
+        if len(self.recent_states) == 20 and unique_states < 6:
+            self.boredom_level += 0.1 # Increase boredom
+        else:
+            self.boredom_level = max(0.0, self.boredom_level - 0.05) # Decay boredom
+            
+        # Cap boredom
+        self.boredom_level = min(1.0, self.boredom_level)
+        
+        # System 2 Trigger: High Uncertainty OR High Boredom
         used_system2 = False
-        if entropy > uncertainty_threshold:
+        if entropy > uncertainty_threshold or self.boredom_level > 0.5:
             goal, confidence = self.system2(self.workspace)
             mx.eval(goal, confidence)
-            # Modulate actions based on goal
-            action_probs = action_probs * 0.7 + mx.softmax(goal[:self.action_dim]) * 0.3
+            
+            # If bored, System 2 forces exploration (random goal)
+            if self.boredom_level > 0.5:
+                # Inject noise into action probs to break loop
+                noise = mx.random.uniform(0, 1, action_probs.shape)
+                action_probs = (action_probs + noise) / 2.0
+                action_probs = mx.softmax(action_probs)
+            else:
+                # Standard System 2 modulation
+                action_probs = action_probs * 0.7 + mx.softmax(goal[:self.action_dim]) * 0.3
+                
             used_system2 = True
             self.system2_calls += 1
         
@@ -274,7 +304,8 @@ class HeterogeneousAgent:
             'entropy': float(entropy),
             'used_system2': used_system2,
             'inference_time': inference_time,
-            'buffer_size': len(self.online_buffer)
+            'buffer_size': len(self.online_buffer),
+            'boredom': self.boredom_level
         }
     
     def sleep(self, epochs: int = 5, prioritize_hard_examples: bool = False) -> Dict:

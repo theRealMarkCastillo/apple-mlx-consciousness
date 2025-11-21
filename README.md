@@ -14,70 +14,49 @@ This research project explores how **Apple Silicon (M-series chips)** enables br
 
 **Hypothesis:** Apple Silicon's unified memory architecture enables novel cognitive simulations that demonstrate emergent collective consciousness in multi-agent systems.
 
-**Current Focus:** Building from single-agent demonstrations to 100+ agent swarms with shared episodic memory and collective decision-making.
+**Current Focus:** Progressing from single-agent cognition → multi-agent swarms → heterogeneous (GPU + NPU) dual-process learning → multimodal perception (vision + text) with persistent state.
 
 **Target Impact:** Publishable research at the intersection of cognitive science, AI/ML, and systems architecture.
 
 ---
 
-## 🏗️ Architecture: "Bicameral Global Workspace"
+## 🏗️ Architecture Overview
 
-The core `BicameralAgent` integrates multiple consciousness theories:
+Core agents:
 
-### 1. **Global Workspace Theory (Baars, 1988)**
-- Shared "stream of consciousness" broadcasts information to all cognitive modules
-- Implemented as a persistent 128-dimensional state vector in unified memory
-- **Apple Silicon Advantage:** Zero-copy access from CPU, GPU, and Neural Engine
-
-### 2. **Dual-Process Theory (Kahneman, 2011)**
-- **System 1:** Fast, automatic, intuitive processing (shallow neural network)
-- **System 2:** Slow, deliberate, meta-cognitive monitoring (evaluates confidence)
-- Detects uncertainty via entropy and triggers intervention (recall or imagination)
-
-### 3. **Episodic Memory (Hippocampal Model)**
-- Content-addressable storage: (State, Action, Reward, NextState) tuples
-- GPU-accelerated cosine similarity retrieval (10M+ memories possible)
-- **Apple Silicon Advantage:** All agents share one memory pool with instant access
-
-### 4. **World Model (Prefrontal Cortex)**
-- Predictive neural network: `f(state, action) → next_state`
-- Enables "imagination" - mental simulation before acting
-- Trained during "sleep" cycles via batch consolidation
-
-### 5. **Meta-Cognition & Top-Down Attention**
-- System 2 sets goal vectors that bias perception
-- Implements selective attention and confirmation bias
-- Monitors self-confidence to trigger deliberate reasoning
-
----
-
-## 📂 Repository Structure
-
+For concise, command-only instructions see **`QUICKSTART.md`**.
+Below is the extended context version (keep this high-level; details live in Quickstart file).
+- `BicameralAgent`: Original dual-process + global workspace implementation.
+### Installation (summary)
+Clone, enter, install deps:
+```bash
+git clone https://github.com/theRealMarkCastillo/apple-mlx-consciousness.git
+cd apple-mlx-consciousness
+pip install -r requirements.txt
 ```
-apple-mlx-consciousness/
-├── cognitive_architecture.py      # Core: BicameralAgent, GlobalWorkspace, Memory, WorldModel
-├── swarm_architecture.py          # Phase 2: ConsciousSwarm, CollectiveWorkspace, Communication
-├── heterogeneous_architecture.py  # Phase 4: GPU-NPU heterogeneous compute
-├── simulation.py                  # CLI demo: Stream of consciousness with recall/imagination
-├── conscious_chatbot.py           # Application: Chatbot with internal meta-cognition
+- **Apple Silicon Advantage:** Zero-copy access from CPU, GPU, and Neural Engine
+### Run Examples (abbreviated)
+Further commands (vision, benchmarking, swarm, persistence) consolidated in `QUICKSTART.md`.
+├── sensory_cortex.py               # VisualCortex + MultiModalFuser (vision/text grounding)
+├── biological_nlp.py               # SDR encoder + associative memory
+├── conscious_chatbot.py            # Multimodal conscious interface (stateful)
+├── visual_simulation.py            # Real-time System1 vs System2 demonstration
+├── benchmark_performance.py        # Latency / throughput / memory compression
+├── train_from_data.py              # Offline behavioral cloning + brain persistence
+├── train_vision.py                 # Vision-text alignment (synthetic shapes & colors)
+├── generate_training_data.py       # Synthetic experiences + conversation data
+├── foraging_environment.py         # Resource collection task for swarms
 │
-├── 01_Global_Workspace_Demo.ipynb     # 📊 Educational: Theory + visualizations
-├── 02_Learning_and_Dreaming.ipynb     # 🌙 Experiment: Sleep consolidation benefits
-├── 03_Conscious_Chatbot_Internals.ipynb  # 💬 Analysis: Real-time thought visualization
-├── 04_Multi_Agent_Swarm_Demo.ipynb    # 🌐 Phase 2: Collective consciousness experiments
-├── 05_Phase_Transitions.ipynb         # 🔬 Phase 3: Consciousness emergence analysis
-├── 06_Heterogeneous_Compute.ipynb     # 🚀 Phase 4: Quantization & hippocampus-cortex learning
+├── 01_Global_Workspace_Demo.ipynb
+├── 02_Learning_and_Dreaming.ipynb
+├── 03_Conscious_Chatbot_Internals.ipynb
+├── 04_Multi_Agent_Swarm_Demo.ipynb
+├── 05_Phase_Transitions.ipynb
+├── 06_Heterogeneous_Compute.ipynb
+├── 08_Multimodal_Consciousness.ipynb
 │
-├── consciousness_metrics.py       # Phase 3: Φ, metacognition, coherence metrics
-├── phase_transition_experiment.py # Phase 3: Parameter sweep infrastructure
-├── benchmark_scaling.py           # Phase 2.2: Multi-agent scaling benchmarks
-├── foraging_environment.py        # Phase 2.3: Collective foraging task
-│
-├── requirements.txt               # Python dependencies (pinned versions)
-├── README.md                      # This file
-├── ROADMAP.md                     # Research plan & milestones
-├── ALIGNMENT_REVIEW.md            # Phase 1→2 transition checklist
-└── .gitignore                     # Version control settings
+├── ROADMAP.md  │ ALIGNMENT_REVIEW.md │ requirements.txt │ .gitignore
+└── README.md
 ```
 
 ### Key Files
@@ -86,7 +65,12 @@ apple-mlx-consciousness/
 |------|-------------|--------|
 | **`cognitive_architecture.py`** | Complete implementation (417 lines) with all cognitive modules | ✅ Phase 1 Complete |
 | **`swarm_architecture.py`** | Multi-agent system (407 lines) - collective consciousness at scale | ✅ Phase 2 Complete |
-| **`heterogeneous_architecture.py`** | GPU-NPU heterogeneous compute (550 lines) - 3.2x memory compression | ✅ Phase 4 Complete |
+| **`heterogeneous_architecture.py`** | GPU-NPU heterogeneous compute - 3.2× memory compression | ✅ Phase 4 Complete |
+| **`sensory_cortex.py`** | VisualCortex + MultiModalFuser (CLIP-like alignment) | ✅ Phase 5 Extension |
+| **`train_vision.py`** | Synthetic shape/color grounding (vision ↔ text) | ✅ Added |
+| **`visual_simulation.py`** | Live System1 vs System2 cognitive cycle visualization | ✅ Added |
+| **`benchmark_performance.py`** | Latency & throughput comparison (quantized vs full) | ✅ Added |
+| **`train_from_data.py`** | Offline sleep consolidation + brain persistence | ✅ Updated |
 | **`consciousness_metrics.py`** | Φ, metacognition, coherence metrics (337 lines) | ✅ Phase 3 Complete |
 | **`phase_transition_experiment.py`** | Parameter sweep infrastructure (427 lines) | ✅ Phase 3 Complete |
 | **`01_Global_Workspace_Demo.ipynb`** | ⭐ **START HERE** - Educational notebook with theory and visualizations | ✅ Enhanced with theory |
@@ -117,8 +101,7 @@ apple-mlx-consciousness/
 ### Installation
 
 ```bash
-# Clone the repository
-git clone https://github.com/yourusername/apple-mlx-consciousness.git
+git clone https://github.com/theRealMarkCastillo/apple-mlx-consciousness.git
 cd apple-mlx-consciousness
 
 # Install dependencies
@@ -139,13 +122,36 @@ python simulation.py
 ```
 *Watch for `🔴 RECALL` (memory retrieval) and `🟢 Flow` (automatic processing)*
 
-**3. Conscious Chatbot**
+**3. Conscious Chatbot (Stateful; loads vision + brain if present)**
 ```bash
 python conscious_chatbot.py
 ```
 *Chat with an agent that shows its internal confidence and thought process*
 
-**4. Phase 5 Advanced Demos**
+**4. Vision Grounding (Synthetic shapes/colors)**
+```bash
+python train_vision.py
+```
+Produces: `visual_cortex.npz`, `multimodal_fuser.npz`
+
+**5. Offline Behavioral Cloning + Persistence**
+```bash
+python generate_training_data.py   # (once) create synthetic_experiences.json
+python train_from_data.py          # trains System1 → saves agent_brain.npz
+```
+
+**6. Performance Benchmark (NPU vs GPU)**
+```bash
+python benchmark_performance.py
+```
+
+**7. Visual Cognitive Simulation**
+```bash
+python visual_simulation.py
+```
+Observe: Blue = System1 (fast), Orange = System2 (deliberate)
+
+**8. Swarm / Foraging**
 ```bash
 # Wake-Sleep Active Learning
 python heterogeneous_training.py
@@ -159,7 +165,18 @@ python sparse_memory.py
 
 ---
 
-## 📊 Current Results (Phase 1: Single Agent)
+## 📊 Current Results (Latest Additions)
+
+### Heterogeneous Performance (Quantized vs Full Precision)
+| Metric | Quantized (NPU+GPU) | Full Precision (GPU only) |
+|--------|---------------------|---------------------------|
+| Throughput (steps/sec) | ~949 | ~855 |
+| P50 Latency (ms) | 0.93 | 0.99 |
+| P99 Latency (ms) | 1.83 | 4.40 |
+| System1 Size | 22 KB | 70 KB |
+| Compression | 3.2× | — |
+
+Interpretation: NPU path slightly improves worst-case latency and reduces model memory, enabling larger swarms and always-on modes.
 
 ### Architecture Specifications
 
@@ -254,7 +271,7 @@ See **[ROADMAP.md](ROADMAP.md)** for detailed timeline. Summary:
 - **Biological plausibility:** Dual-process + hippocampus analogy
 - **Next:** 500+ agent tests, Phase 5 hardware-aware innovations
 
-### 🔮 Phase 5: Hardware-Aware Innovations (COMPLETED)
+### 🔮 Phase 5: Hardware-Aware / Multimodal Innovations (COMPLETED)
 - ✅ **Wake-Sleep Active Learning:** `heterogeneous_training.py`
 - ✅ **Adversarial Co-Evolution:** `adversarial_coevolution.py`
 - ✅ **Sparse Memory Scaling:** `sparse_memory.py` (20x capacity)
@@ -263,6 +280,7 @@ See **[ROADMAP.md](ROADMAP.md)** for detailed timeline. Summary:
 - **Active Learning:** Rapid convergence on hard examples
 - **Adversarial Robustness:** Disagreement minimized (0.06 → 0.003)
 - **Memory Capacity:** 168M memories on 32GB system (Sparse)
+- **Multimodal Alignment:** Vision → text cosine similarity ~0.73 (synthetic labeling)
 
 ---
 
@@ -286,15 +304,15 @@ Traditional GPU systems suffer from:
 
 ### Concrete Benefits for Cognitive Simulation
 
-| Feature | Traditional GPU | Apple M4 Pro (Mac Mini, 64GB) |
-|---------|----------------|-------------------------------|
-| **Agent capacity** | 10-20 agents | 100+ agents (tested) |
-| **Shared memory** | Must duplicate data | Single shared pool (zero-copy) |
-| **State dimensions** | 32-64D typical | 128D per agent (cache-optimized) |
-| **Memory retrieval** | 1M memories max | 10M+ memories possible |
-| **Transfer overhead** | 10-100ms per copy | Zero (unified memory) |
-| **Multi-model execution** | Sequential | Parallel (CPU+GPU+ANE) |
-| **Power consumption** | 300-450W | ~40-60W (6-10x more efficient) |
+| Feature | Traditional GPU | Apple M4 Pro (64GB) |
+|---------|----------------|---------------------|
+| Agent capacity | 10–20 | 100+ (tested) |
+| Shared memory | Duplicated / copied | Single zero-copy pool |
+| State dimensions | 32–64D | 128D (fast cache reuse) |
+| Memory retrieval | ~1M practical | 10M+ feasible |
+| Transfer overhead | PCIe bottlenecks | None (unified) |
+| Multi-model execution | Sequential | Concurrent CPU/GPU/NPU |
+| Power consumption | 300–450W | ~40–60W |
 
 ---
 
@@ -328,9 +346,11 @@ This is an active research project. Contributions welcome in:
 
 **To contribute:**
 1. Fork the repository
-2. Create a feature branch (`git checkout -b feature/amazing-idea`)
-3. Commit changes with clear messages
-4. Push and open a Pull Request
+2. Create a feature branch (`git checkout -b feature/<short-topic>`) 
+3. Keep patches focused (architecture, metrics, performance)
+4. Open a PR with: context, rationale, benchmark (if perf-related)
+
+Please avoid committing large generated artifacts (`*.npz`, synthetic JSON) — already excluded via `.gitignore`.
 
 ---
 
@@ -351,9 +371,11 @@ MIT License - see [LICENSE](LICENSE) file for details.
 
 ## 📬 Contact & Updates
 
-- **GitHub Issues:** [Report bugs or request features](https://github.com/yourusername/apple-mlx-consciousness/issues)
-- **Discussions:** [Share ideas and results](https://github.com/yourusername/apple-mlx-consciousness/discussions)
-- **Twitter/X:** [@yourusername](https://twitter.com/yourusername) - Follow for updates
+- **GitHub Issues:** Use repository issue tracker (bug reports, feature proposals)
+- **Discussions:** Open for theoretical debate & experiment sharing
+- **Updates:** Follow the repo’s releases & commit log
+
+> If publishing derived research, please cite original theory sources and link back here.
 
 ---
 

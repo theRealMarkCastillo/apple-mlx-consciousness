@@ -103,10 +103,10 @@ class SharedMemoryPool:
     Leverages unified memory - all agents read/write to same pool.
     10M memories × 128D states = ~5GB (easily fits in 64GB RAM)
     """
-    def __init__(self, memory_file: str = "swarm_collective_memory.json"):
+    def __init__(self, memory_file: str = "swarm_collective_memory.json", state_dim: int = 128):
         self.memory = EpisodicMemory(
             memory_file=memory_file, 
-            expected_state_dim=128
+            expected_state_dim=state_dim
         )
         self.access_log = []  # Track which agents access which memories
         
@@ -262,7 +262,7 @@ class ConsciousSwarm:
         
         # Shared infrastructure
         self.collective_workspace = CollectiveWorkspace(collective_dim, num_agents)
-        self.shared_memory = SharedMemoryPool()
+        self.shared_memory = SharedMemoryPool(state_dim=agent_state_dim)
         self.communication = AgentCommunication(num_agents)
         
         # Swarm-level metrics

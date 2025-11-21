@@ -31,6 +31,8 @@ This project implements a **Bicameral Agent** architecture inspired by dual-proc
 - **[`THEORY_AND_IMPLEMENTATION.md`](THEORY_AND_IMPLEMENTATION.md)** - Complete guide to the cognitive science theories underpinning this project and how each is implemented in code
 - **[`ARCHITECTURE.md`](ARCHITECTURE.md)** - Technical architecture with system diagrams and component interactions
 - **[`COLLECTIVE_CONSCIOUSNESS.md`](COLLECTIVE_CONSCIOUSNESS.md)** - Deep dive into multi-agent swarm mechanics and collective intelligence
+- **[`GLOSSARY.md`](GLOSSARY.md)** - Definitions of key terms (Phi, Bicameralism, System 1/2, etc.)
+- **[`EXPERIMENTS.md`](EXPERIMENTS.md)** - Lab manual with guided experiments for researchers and students
 
 ### Core Components
 *   **`BicameralAgent`**: The fundamental cognitive unit, featuring:
@@ -123,6 +125,19 @@ python conscious_chatbot.py
 python visual_simulation.py
 ```
 *Observe: Blue = System1 (fast), Orange = System2 (deliberate)*
+
+### ✅ Validation & Testing
+
+To verify the integrity of the entire system (Cognition, Swarm, Hardware, Multimodal), run the master test suite:
+
+```bash
+python run_all_tests.py
+```
+
+This runs three test suites in sequence:
+1.  `validate_system.py`: Core cognitive architecture (Bicameral, Swarm, Phi).
+2.  `validate_advanced.py`: Hardware-aware features (Quantization, Heterogeneous Compute) and Multimodal Perception.
+3.  `validate_integration.py`: End-to-end pipeline test (Vision -> Fusion -> Agent -> Swarm).
 
 ---
 

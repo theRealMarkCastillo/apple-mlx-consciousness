@@ -113,6 +113,37 @@ class AssociativeMemory:
         
         return self.values[int(best_idx)], confidence
 
+    def save_memory(self, path: str):
+        """Save associative memory to disk."""
+        import json
+        data = []
+        for k, v in zip(self.keys, self.values):
+            data.append({
+                "vector": k.tolist(),
+                "response": v
+            })
+        with open(path, 'w') as f:
+            json.dump(data, f)
+        print(f"💾 Saved {len(data)} memories to {path}")
+
+    def load_memory(self, path: str):
+        """Load associative memory from disk."""
+        import json
+        try:
+            with open(path, 'r') as f:
+                data = json.load(f)
+            
+            self.keys = []
+            self.values = []
+            for item in data:
+                self.keys.append(mx.array(item["vector"]))
+                self.values.append(item["response"])
+            print(f"🧠 Loaded {len(data)} memories from {path}")
+            return True
+        except Exception as e:
+            print(f"⚠️ Could not load memory: {e}")
+            return False
+
     def load_defaults(self):
         """Populate with some basic conversational pairs."""
         # We need a way to generate concept vectors for these keys.

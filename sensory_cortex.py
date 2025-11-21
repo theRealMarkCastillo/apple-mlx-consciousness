@@ -68,6 +68,49 @@ class VisualCortex(nn.Module):
         
         return x.squeeze()
 
+    def save_weights(self, path: str):
+        """Save model weights to disk."""
+        # Flatten parameters for saving
+        flat_params = {}
+        def flatten(d, prefix=""):
+            for k, v in d.items():
+                key = f"{prefix}.{k}" if prefix else k
+                if isinstance(v, dict):
+                    flatten(v, key)
+                else:
+                    flat_params[key] = v
+        flatten(self.parameters())
+        mx.savez(path, **flat_params)
+        print(f"Saved Visual Cortex weights to {path}")
+
+    def load_weights(self, path: str):
+        """Load model weights from disk."""
+        try:
+            weights = mx.load(path)
+            # Unflatten weights (MLX update handles flat dicts if keys match?)
+            # Actually update() expects the same structure.
+            # We need to reconstruct the nested dict or use a utility.
+            # For simplicity, let's assume update() can handle flat dicts with dot notation?
+            # No, MLX update() usually expects nested dicts.
+            
+            # Reconstruct nested dict
+            nested_weights = {}
+            for k, v in weights.items():
+                parts = k.split('.')
+                d = nested_weights
+                for part in parts[:-1]:
+                    if part not in d:
+                        d[part] = {}
+                    d = d[part]
+                d[parts[-1]] = v
+                
+            self.update(nested_weights)
+            print(f"Loaded Visual Cortex weights from {path}")
+            return True
+        except Exception as e:
+            print(f"Could not load weights: {e}")
+            return False
+
 class MultiModalFuser(nn.Module):
     """
     Fuses different sensory modalities into a single Global Workspace state.
@@ -103,3 +146,37 @@ class MultiModalFuser(nn.Module):
         fused_state = fused_state / (mx.linalg.norm(fused_state) + 1e-6)
         
         return fused_state
+
+    def save_weights(self, path: str):
+        """Save model weights to disk."""
+        flat_params = {}
+        def flatten(d, prefix=""):
+            for k, v in d.items():
+                key = f"{prefix}.{k}" if prefix else k
+                if isinstance(v, dict):
+                    flatten(v, key)
+                else:
+                    flat_params[key] = v
+        flatten(self.parameters())
+        mx.savez(path, **flat_params)
+        print(f"Saved MultiModal Fuser weights to {path}")
+
+    def load_weights(self, path: str):
+        """Load model weights from disk."""
+        try:
+            weights = mx.load(path)
+            nested_weights = {}
+            for k, v in weights.items():
+                parts = k.split('.')
+                d = nested_weights
+                for part in parts[:-1]:
+                    if part not in d:
+                        d[part] = {}
+                    d = d[part]
+                d[parts[-1]] = v
+            self.update(nested_weights)
+            print(f"Loaded MultiModal Fuser weights from {path}")
+            return True
+        except Exception as e:
+            print(f"Could not load weights: {e}")
+            return False

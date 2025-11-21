@@ -59,6 +59,9 @@ def train_agent_from_file(filename="synthetic_experiences.json"):
                 
     print(f"\n✅ Training Complete.")
     
+    # Save the trained brain
+    agent.save_brain("agent_brain.npz")
+    
     # Evaluation
     print("\nEvaluating learned behavior...")
     print("Pattern to learn: State[0] > 0 -> Action 0 | State[0] <= 0 -> Action 1")

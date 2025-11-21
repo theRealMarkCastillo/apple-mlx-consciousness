@@ -372,6 +372,47 @@ class HeterogeneousAgent:
             'online_buffer_size': len(self.online_buffer)
         }
 
+    def save_brain(self, path: str):
+        """Save System 1 (Intuition) weights to disk."""
+        # Flatten parameters for saving
+        flat_params = {}
+        def flatten(d, prefix=""):
+            for k, v in d.items():
+                key = f"{prefix}.{k}" if prefix else k
+                if isinstance(v, dict):
+                    flatten(v, key)
+                else:
+                    flat_params[key] = v
+        flatten(self.system1.parameters())
+        mx.savez(path, **flat_params)
+        print(f"💾 Saved System 1 weights to {path}")
+
+    def load_brain(self, path: str):
+        """Load System 1 (Intuition) weights from disk."""
+        try:
+            weights = mx.load(path)
+            # Reconstruct nested dict
+            nested_weights = {}
+            for k, v in weights.items():
+                parts = k.split('.')
+                d = nested_weights
+                for part in parts[:-1]:
+                    if part not in d:
+                        d[part] = {}
+                    d = d[part]
+                d[parts[-1]] = v
+            self.system1.update(nested_weights)
+            
+            # Re-quantize if needed
+            if self.use_quantization:
+                self.system1.quantize_weights(force=True)
+                
+            print(f"🧠 Loaded System 1 weights from {path}")
+            return True
+        except Exception as e:
+            print(f"⚠️ Could not load brain: {e}")
+            return False
+
 
 def benchmark_multi_agent_scaling(agent_counts: Optional[List[int]] = None) -> List[Dict]:
     """

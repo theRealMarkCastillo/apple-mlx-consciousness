@@ -29,8 +29,32 @@ class ConsciousChatbot:
         # Text SDR (2048) -> 128, Vision (128) -> 128, Workspace -> 128
         self.multimodal_fuser = MultiModalFuser(text_dim=2048, vision_dim=128, workspace_dim=128)
         
+        # Load trained weights if available
+        if os.path.exists("visual_cortex.npz"):
+            print("   Loading trained Visual Cortex weights...")
+            self.visual_cortex.load_weights("visual_cortex.npz")
+            
+        if os.path.exists("multimodal_fuser.npz"):
+            print("   Loading trained MultiModal Fuser weights...")
+            self.multimodal_fuser.load_weights("multimodal_fuser.npz")
+        
         # Populate Associative Memory with some innate knowledge
         self._populate_memory()
+        
+        # Load persistent memory if available
+        if os.path.exists("long_term_memory.json"):
+            self.associative_memory.load_memory("long_term_memory.json")
+            
+        # Load persistent brain if available
+        if os.path.exists("agent_brain.npz"):
+            self.agent.load_brain("agent_brain.npz")
+
+    def save_state(self):
+        """Save the current state of the agent."""
+        print("\n💾 Saving Conscious State...")
+        self.associative_memory.save_memory("long_term_memory.json")
+        if self.use_heterogeneous:
+            self.agent.save_brain("agent_brain.npz")
 
     def _populate_memory(self):
         """Initialize the associative memory with basic concepts and loaded data."""
@@ -173,6 +197,7 @@ if __name__ == "__main__":
     while True:
         user_in = input("\nYou: ")
         if user_in.lower() in ['quit', 'exit']:
+            bot.save_state()
             break
             
         img_path = None

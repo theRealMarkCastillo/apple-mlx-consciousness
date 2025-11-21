@@ -55,10 +55,19 @@ phase_transition_results.json
 *.pth
 *.bin
 
-# Generated Plots & Images
+# Generated Plots, Images & Results
 *.png
 *.jpg
 *.jpeg
+*.gif
+swarm_scaling_benchmark.png
+foraging_experiment.png
+heterogeneous_training_results.png
+adversarial_evolution.png
 
-# Experiment Outputs
+# Experiment Outputs & Data
 phase3_output.txt
+*_results.json
+*_output.txt
+benchmark_*.txt
+

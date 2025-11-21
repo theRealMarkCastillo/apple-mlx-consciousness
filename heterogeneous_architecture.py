@@ -16,6 +16,7 @@ unified memory architecture for zero-copy data sharing between NPU/GPU.
 import mlx.core as mx
 import mlx.nn as nn
 import mlx.optimizers as optim
+import mlx.utils
 import numpy as np
 from typing import Optional, Dict, List, Tuple
 import time
@@ -187,10 +188,10 @@ class HeterogeneousAgent:
         
         # Online learning buffer (hippocampus-like)
         self.online_buffer = []
-        self.max_online_buffer = 100
+        self.max_online_buffer = 200
         
         # Optimizer for sleep consolidation
-        self.optimizer = optim.Adam(learning_rate=0.001)
+        self.optimizer = optim.Adam(learning_rate=0.005)
         
         # Quantize System 1 if enabled
         if use_quantization:
@@ -318,7 +319,20 @@ class HeterogeneousAgent:
             log_probs = nn.log_softmax(logits, axis=-1)
             
             # Select log probs for taken actions
+            # Ensure one_hot matches the model's output dimension
+            # If model was loaded with 2 outputs but we are training with 10 actions, this will fail
+            # So we use the model's actual output_dim
             one_hot = mx.eye(model.output_dim)[actions]
+            
+            # Handle shape mismatch if model output dim != action space
+            # This happens if we load a binary classifier (dim=2) but try to learn navigation (dim=4)
+            if log_probs.shape != one_hot.shape:
+                # Pad log_probs or truncate one_hot to match
+                # Safest is to slice one_hot to match log_probs width
+                min_dim = min(log_probs.shape[1], one_hot.shape[1])
+                log_probs = log_probs[:, :min_dim]
+                one_hot = one_hot[:, :min_dim]
+            
             selected_log_probs = mx.sum(log_probs * one_hot, axis=1)
             
             # Policy gradient loss: -mean(log_prob * reward)
@@ -332,6 +346,10 @@ class HeterogeneousAgent:
         
         for i in range(epochs):
             loss, grads = loss_and_grad_fn(self.system1)
+            
+            # Clip gradients to prevent explosion (stabilize training)
+            grads = mlx.utils.tree_map(lambda g: mx.clip(g, -1.0, 1.0), grads)
+            
             self.optimizer.update(self.system1, grads)
             
             # Force evaluation

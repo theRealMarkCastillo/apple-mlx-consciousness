@@ -82,6 +82,27 @@ This project implements a **Bicameral Agent** architecture inspired by dual-proc
 | **`consciousness_metrics.py`** | Φ, metacognition, coherence metrics (337 lines) | ✅ Phase 3 Complete |
 | **`phase_transition_experiment.py`** | Parameter sweep infrastructure (427 lines) | ✅ Phase 3 Complete |
 
+### 🎮 Visual Simulation Demo
+
+The `visual_simulation.py` script provides a real-time window into the agent's cognitive processes as it navigates a grid world.
+
+**Features:**
+- **Dual-Process Visualization**: Watch the agent switch between System 1 (Blue/Fast/NPU) and System 2 (Orange/Slow/GPU) based on entropy.
+- **Internal State Monitoring**: Real-time graphs of Global Workspace activity, Confidence, and Entropy.
+- **Real-Time Learning**: The agent learns from its experiences via simulated "sleep cycles" every 50 steps.
+
+**Usage:**
+```bash
+# Standard Mode (Pre-trained + Learning)
+python visual_simulation.py
+
+# Scratch Mode (Random Brain + Learning)
+python visual_simulation.py --scratch
+
+# Inference Only (No Learning)
+python visual_simulation.py --no-learn
+```
+
 ---
 
 ## 🚀 Quick Start

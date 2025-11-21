@@ -67,7 +67,14 @@ python benchmark_performance.py
 ```
 Real-time System1 vs System2 demo (blue fast; orange deliberative):
 ```bash
+# Default: Uses pre-trained model + Real-time learning enabled
 python visual_simulation.py
+
+# Start from scratch (random brain) + Real-time learning
+python visual_simulation.py --scratch
+
+# Inference only (Learning disabled)
+python visual_simulation.py --no-learn
 ```
 
 ---

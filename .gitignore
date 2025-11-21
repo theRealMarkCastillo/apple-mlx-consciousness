@@ -43,6 +43,7 @@ htmlcov/
 # Generated Data & Memory
 conversation_data.json
 synthetic_experiences.json
+synthetic_experiences_*.json
 long_term_memory.json
 swarm_collective_memory.json
 phase_transition_results.json

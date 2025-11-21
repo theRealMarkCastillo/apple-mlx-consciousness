@@ -231,8 +231,11 @@ class HeterogeneousAgent:
         
         mx.eval(action_probs)  # Force computation
         
-        # Calculate uncertainty (entropy)
-        entropy = -mx.sum(action_probs * mx.log(action_probs + 1e-9))
+        # Calculate uncertainty (entropy) - ensure valid range
+        # Clamp probabilities to avoid log(0) issues
+        action_probs_clamped = mx.clip(action_probs, 1e-8, 1.0)
+        entropy = -mx.sum(action_probs_clamped * mx.log(action_probs_clamped))
+        entropy = mx.abs(entropy)  # Ensure positive
         uncertainty_threshold = 1.5
         
         # System 2: Deliberate reasoning if uncertain (GPU)

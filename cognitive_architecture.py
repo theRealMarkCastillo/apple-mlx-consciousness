@@ -299,17 +299,24 @@ class BicameralAgent:
         if not is_confident:
             # Strategy A: Recall (Fast, based on past)
             memories = self.memory.retrieve(current_state, k=3)
-            # ... (Memory bias logic same as before) ...
             if memories:
-                memory_bias = mx.zeros_like(logits)
+                memory_boost = 0.0
                 for mem in memories:
-                    past_action = mx.array(mem['action'])
+                    past_action = mem['action']
                     past_reward = mem['reward']
-                    if past_reward > 0:
-                        memory_bias = memory_bias + (past_action * past_reward)
+                    
+                    # Extract action index from list
+                    if isinstance(past_action, list):
+                        action_idx = past_action[0] if len(past_action) > 0 else 0
                     else:
-                        memory_bias = memory_bias - (past_action * abs(past_reward))
-                logits = logits + (memory_bias * 0.5)
+                        action_idx = int(past_action)
+                    
+                    # Only boost current top action if it matches past success
+                    if past_reward > 0:
+                        memory_boost += past_reward * 0.1
+                
+                # Apply uniform boost to encourage consistency
+                logits = logits + memory_boost
 
             # Strategy B: Imagination (Slow, uses World Model)
             # If still uncertain or if no memories, try to simulate future
@@ -391,7 +398,23 @@ class BicameralAgent:
             return
 
         states = mx.array([m['state'] for m in valid_batch])
-        actions = mx.array([m['action'] for m in valid_batch])
+        
+        # Normalize actions - convert to one-hot vectors
+        action_list = []
+        for m in valid_batch:
+            action = m['action']
+            # Extract scalar action index
+            if isinstance(action, list):
+                action_idx = int(action[0]) if action else 0
+            else:
+                action_idx = int(action)
+            
+            # Create one-hot vector
+            one_hot = [0.0] * self.action_dim
+            one_hot[action_idx] = 1.0
+            action_list.append(one_hot)
+        
+        actions = mx.array(action_list)  # Shape: (N, action_dim)
         next_states = mx.array([m['next_state'] for m in valid_batch])
         # rewards = mx.array([m['reward'] for m in valid_batch]) # Unused
 

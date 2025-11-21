@@ -243,7 +243,7 @@ No critical "freezing point" found in tested ranges. Consciousness emerges gradu
 - [ ] Energy consumption measurements (requires powermetrics)
 - [ ] Test with 500+ agent swarms to validate projections
 - [ ] Compare 4-bit vs 8-bit quantization
-- [ ] Add actual backpropagation in sleep() consolidation
+- [x] ✅ Add actual backpropagation in sleep() consolidation (Policy Gradient with nn.value_and_grad)
 
 ---
 
@@ -709,6 +709,230 @@ if primary_agent.confidence_variance > threshold:
 
 ---
 
+## Phase 6: Future Research Directions
+
+### 🧬 Biological Fidelity Enhancement
+
+#### REM vs SWS Sleep Phases
+- **Goal:** Implement different replay strategies for different memory types
+- **Approach:** 
+  - REM sleep: Random replay for creativity and generalization
+  - SWS (Slow-Wave Sleep): Sequential replay for memory consolidation
+  - Alternate between phases with biological timing
+- **Expected Outcome:** Improved long-term memory retention and creative problem-solving
+
+#### Synaptic Homeostasis
+- **Goal:** Prevent runaway weight growth through downscaling
+- **Approach:**
+  - Implement synaptic scaling during sleep cycles
+  - Normalize weights while preserving relative strengths
+  - Test stability over extended training (1M+ steps)
+- **Expected Outcome:** Stable long-term learning without catastrophic forgetting
+
+#### Neuromodulation Signals
+- **Goal:** Add dopamine/norepinephrine-like signals for meta-learning
+- **Approach:**
+  - Dopamine: Reward prediction error modulates learning rate
+  - Norepinephrine: Arousal signal modulates System 2 engagement
+  - Implement as global state variables influencing all agents
+- **Expected Outcome:** Context-aware learning rate adaptation
+
+#### Circadian Rhythms
+- **Goal:** Vary learning rates and consolidation windows over time
+- **Approach:**
+  - 24-hour simulated cycle with day/night phases
+  - Increased consolidation during "night" hours
+  - Reduced learning rate during "fatigue" periods
+- **Expected Outcome:** More biologically realistic learning dynamics
+
+---
+
+### ⚡ Hardware Optimization & Validation
+
+#### True AMX Benchmarking
+- **Goal:** Measure actual Apple Silicon matrix accelerator performance
+- **Approach:**
+  - Profile INT8 operations on Neural Engine
+  - Compare FP32 (GPU) vs INT8 (NPU) latency/energy
+  - Use Instruments.app for detailed profiling
+- **Expected Outcome:** Validated 3-5x speedup claims with real measurements
+
+#### Neural Engine Deployment
+- **Goal:** Deploy quantized models directly to ANE
+- **Approach:**
+  - Convert MLX models to CoreML format
+  - Test ANE-native inference on M4 Pro
+  - Measure end-to-end latency for 1000-agent swarm
+- **Expected Outcome:** <1ms per-agent inference on ANE
+
+#### Memory Bandwidth Optimization
+- **Goal:** Exploit unified memory for zero-copy transfers
+- **Approach:**
+  - Benchmark MLX vs PyTorch memory transfers
+  - Measure actual unified memory bandwidth utilization
+  - Optimize data layout for cache efficiency
+- **Expected Outcome:** Demonstrated 2-3x bandwidth advantage
+
+#### Power Measurement & Energy Validation
+- **Goal:** Validate energy savings claims with actual measurements
+- **Approach:**
+  - Use `powermetrics` to measure GPU/NPU power draw
+  - Compare energy consumption: FP32 vs INT8 inference
+  - Calculate energy-per-inference for 10k agent swarm
+  - Measure watts during wake vs sleep cycles
+- **Expected Outcome:** Published energy efficiency report showing 70-85% savings
+
+---
+
+### 🎯 Advanced Learning Algorithms
+
+#### Meta-Learning for Fast Adaptation
+- **Goal:** Learn-to-learn via MAML or Reptile on hard examples
+- **Approach:**
+  - Implement MAML (Model-Agnostic Meta-Learning)
+  - Train agents to adapt quickly to new tasks (few-shot learning)
+  - Test on task distribution: navigation, foraging, communication
+- **Expected Outcome:** 10x faster adaptation to novel tasks
+
+#### Curriculum Learning
+- **Goal:** Gradually increase task difficulty during evolution
+- **Approach:**
+  - Start with simple environments (1D navigation)
+  - Progressively add complexity (2D, obstacles, multi-goal)
+  - Track performance on each difficulty level
+- **Expected Outcome:** Higher final performance vs. random task order
+
+#### Multi-Task Learning
+- **Goal:** Train single agent on diverse tasks simultaneously
+- **Approach:**
+  - Unified architecture for: navigation, communication, memory retrieval
+  - Shared System 1, task-specific System 2 heads
+  - Measure transfer learning between tasks
+- **Expected Outcome:** Emergent general intelligence across task domains
+
+#### Continual Learning & Catastrophic Forgetting Prevention
+- **Goal:** Add new skills without losing old ones
+- **Approach:**
+  - Implement Elastic Weight Consolidation (EWC)
+  - Progressive neural networks for new tasks
+  - Test on sequence: Task A → Task B → Task A retention
+- **Expected Outcome:** <10% performance degradation on old tasks
+
+---
+
+### 🌐 Scaling & Deployment at Scale
+
+#### Distributed Training
+- **Goal:** Multi-GPU/multi-machine adversarial evolution
+- **Approach:**
+  - Implement data-parallel training with MLX distributed
+  - Test on 2-4 M4 Pro machines via network
+  - Benchmark scaling efficiency (linear, sub-linear)
+- **Expected Outcome:** 100k+ agent swarms with near-linear scaling
+
+#### Edge Deployment
+- **Goal:** Quantized models on iPhone/iPad Neural Engine
+- **Approach:**
+  - Export to CoreML for iOS deployment
+  - Test on iPhone 16 Pro (A18 Pro chip)
+  - Measure on-device inference latency
+- **Expected Outcome:** Real-time consciousness simulation on mobile devices
+
+#### Real-Time Inference
+- **Goal:** Sub-millisecond latency for 1000+ agent swarms
+- **Approach:**
+  - Optimize critical path with MLX JIT compilation
+  - Batch inference across agents
+  - Profile and eliminate bottlenecks
+- **Expected Outcome:** <100μs per-agent inference time
+
+#### Cloud-Local Hybrid Computation
+- **Goal:** Hybrid local (NPU) + cloud (GPU) computation
+- **Approach:**
+  - System 1 runs locally on NPU (low latency)
+  - System 2 offloads to cloud GPU when needed
+  - Implement latency-aware scheduling
+- **Expected Outcome:** Best of both worlds - fast local + powerful cloud
+
+---
+
+### 🔬 Scientific Validation & Benchmarking
+
+#### Neuroscience Comparison
+- **Goal:** Compare activation patterns with fMRI data
+- **Approach:**
+  - Collaborate with neuroscience lab for fMRI datasets
+  - Train agents on same tasks as human subjects
+  - Correlate agent workspace activations with fMRI BOLD signals
+- **Expected Outcome:** Published cross-validation study
+
+#### Standard RL Benchmarks
+- **Goal:** Test on Atari, MuJoCo, Procgen
+- **Approach:**
+  - Adapt cognitive architecture for standard environments
+  - Compare vs. PPO, DQN, A3C baselines
+  - Measure sample efficiency and final performance
+- **Expected Outcome:** Competitive or superior performance with better interpretability
+
+#### Ablation Studies
+- **Goal:** Isolate contribution of each Phase 5 component
+- **Approach:**
+  - Baseline: No wake-sleep, no adversarial, dense memory
+  - +Wake-Sleep: Measure performance gain
+  - +Adversarial: Measure robustness gain
+  - +Sparse: Measure capacity gain
+- **Expected Outcome:** Quantified contribution of each innovation
+
+#### Human Psychophysics Comparison
+- **Goal:** Compare agent decisions with human performance
+- **Approach:**
+  - Design tasks with known human performance (reaction time, accuracy)
+  - Run same experiments with agents
+  - Statistical comparison of reaction times, error patterns
+- **Expected Outcome:** Agents match human-like decision-making profiles
+
+---
+
+### 📊 Priority Roadmap (Next 6-12 Months)
+
+| Priority | Research Direction | Timeline | Dependencies | Expected Impact |
+|----------|-------------------|----------|--------------|-----------------|
+| **P0** | Power measurement validation | 2 weeks | powermetrics, hardware access | Validate core claims |
+| **P0** | Ablation studies | 4 weeks | Phase 5 complete | Quantify contributions |
+| **P1** | Meta-learning (MAML) | 6 weeks | Advanced ML knowledge | 10x faster adaptation |
+| **P1** | Neural Engine deployment | 4 weeks | CoreML expertise | True ANE utilization |
+| **P2** | Standard RL benchmarks | 8 weeks | RL environment setup | Academic credibility |
+| **P2** | Multi-task learning | 6 weeks | Task dataset creation | General intelligence |
+| **P3** | Distributed training | 8 weeks | Multi-machine access | 100k+ agent scaling |
+| **P3** | Neuroscience comparison | 12 weeks | fMRI data partnership | Scientific validation |
+
+---
+
+### 🎯 Immediate Next Steps (Weeks 14-16)
+
+1. **⚡ Energy Validation (Week 14)**
+   - Set up `powermetrics` logging
+   - Run 1-hour baseline power measurement
+   - Run 1-hour Phase 5 optimized measurement
+   - Calculate actual energy savings percentage
+   - Document methodology in `docs/energy_validation.md`
+
+2. **🔬 Ablation Study Design (Week 15)**
+   - Create 4 experimental conditions (baseline, +WS, +Adv, +Sparse)
+   - Design standardized benchmark task
+   - Run 10 trials per condition
+   - Statistical analysis of results
+   - Write ablation study report
+
+3. **🎯 Meta-Learning Prototype (Week 16)**
+   - Implement MAML algorithm for HeterogeneousAgent
+   - Create 10 simple meta-learning tasks
+   - Test few-shot adaptation (1-shot, 5-shot, 10-shot)
+   - Compare with baseline learning curve
+   - Document findings in `experiments/meta_learning.md`
+
+---
+
 ## Risk Mitigation
 
 ### Risk: Multi-agent scaling hits memory limits
@@ -723,24 +947,40 @@ if primary_agent.confidence_variance > threshold:
 ### Risk: Code becomes unmaintainable
 **Mitigation:** Write tests, document extensively, refactor every 2 weeks
 
+### Risk: Hardware claims are overestimated
+**Mitigation:** Validate all performance claims with actual measurements using powermetrics and Instruments
+
+### Risk: Future directions too ambitious
+**Mitigation:** Focus on P0/P1 priorities first, ensure each milestone is achievable in 4-8 weeks
+
 ---
 
 ## Current Status
 
-**Phase:** 1 → 2 Transition  
-**Next Milestone:** 2.1 - Swarm Architecture Design  
+**Phase:** 5 Complete → 6 Planning  
+**Next Milestone:** 6.1 - Energy Validation & Ablation Studies  
 **Blockers:** None  
 **Last Updated:** 2025-11-20
 
 **Recent Achievements:**
-- ✅ Single-agent architecture validated
-- ✅ Educational notebook with theory completed
-- ✅ Requirements pinned and tested
+- ✅ Phase 5: Hardware-Aware Cognition completed
+  - Wake-sleep active learning implemented
+  - Adversarial co-evolution achieving 72.5% robustness gain
+  - Sparse memory with 20x compression ratio
+  - Notebook 07 comprehensive with visualizations and analysis
+- ✅ Pre-trained model (agent_brain.npz): 100k samples, 75% accuracy
+- ✅ Backpropagation implemented in sleep() consolidation
 
 **Immediate Next Steps:**
-1. Design `ConsciousSwarm` class architecture
-2. Prototype 10-agent system
-3. Benchmark memory usage and performance
+1. Run powermetrics validation for energy savings claims
+2. Design and execute ablation studies for Phase 5 components
+3. Begin MAML meta-learning prototype implementation
+
+**Future Research Priorities:**
+- **P0:** Power measurement validation (2 weeks)
+- **P0:** Ablation studies (4 weeks)
+- **P1:** Meta-learning with MAML (6 weeks)
+- **P1:** Neural Engine deployment (4 weeks)
 
 ---
 
@@ -758,12 +998,33 @@ if primary_agent.confidence_variance > threshold:
 - Phase space colored by consciousness index
 - Real-time dashboard with live metrics
 
+### Phase 6 Research Questions
+- **Biological Fidelity:** Can we replicate REM/SWS sleep differences in artificial systems?
+- **Meta-Learning:** How fast can agents adapt to completely novel tasks?
+- **Energy Efficiency:** What's the true energy cost per inference on real hardware?
+- **Scaling Laws:** Does consciousness emergence follow power law with agent count?
+- **Transfer Learning:** Can agents trained on one domain transfer to another?
+
+### Potential Collaborations
+- **Neuroscience Labs:** fMRI data comparison for validation
+- **Apple ML Team:** CoreML optimization and ANE deployment
+- **RL Benchmarking Groups:** Standard task evaluation
+- **Cognitive Science Researchers:** Human psychophysics comparison studies
+
+### Publication Targets
+- **NeurIPS 2026:** "Hardware-Aware Cognitive Architectures on Apple Silicon"
+- **ICLR 2026:** "Meta-Learning for Consciousness Simulation"
+- **Nature Machine Intelligence:** "Biological Principles for Efficient AI on Unified Memory Systems"
+- **ICML Workshop:** "Energy-Efficient Multi-Agent Consciousness"
+
 ### Future: Beyond Research
 - Turn this into an educational framework for teaching consciousness theories
 - Open-source toolkit for cognitive simulation on Apple Silicon
 - Consulting for companies building multi-agent systems
 - Book: "Consciousness Engineering with Apple Silicon"
+- Tutorial series: "Hardware-Aware AI: From Theory to Practice"
+- Framework: MLXConsciousness - PyPI package for cognitive architectures
 
 ---
 
-**Remember:** The goal isn't just to publish—it's to push what's possible with unified memory architectures. Think big, iterate fast, document everything. 🚀
+**Remember:** The goal isn't just to publish—it's to push what's possible with unified memory architectures AND establish biological principles as computational advantages. Think big, iterate fast, document everything, validate claims rigorously. 🚀

@@ -30,9 +30,13 @@ class PhaseTransitionExperiment:
     Runs systematic parameter sweeps to map consciousness emergence.
     """
     
-    def __init__(self, results_file: str = "phase_transition_results.json"):
+    def __init__(self, results_file: str = "phase_transition_results.json", 
+                 use_pretrained: bool = True,
+                 model_path: str = "agent_brain.npz"):
         self.results_file = results_file
         self.results = []
+        self.use_pretrained = use_pretrained
+        self.model_path = model_path
         
     def run_single_config(self, 
                          state_dim: int = 128,
@@ -64,6 +68,16 @@ class PhaseTransitionExperiment:
             state_dim=state_dim,
             action_dim=action_dim
         )
+        
+        # Load pre-trained weights if available (from 100k dataset training)
+        if self.use_pretrained:
+            try:
+                import os
+                if os.path.exists(self.model_path):
+                    agent.system1.load_weights(self.model_path)
+                    print(f"✅ Loaded pre-trained weights from {self.model_path}")
+            except Exception as e:
+                print(f"⚠️  Could not load pre-trained weights: {e}")
         
         # Run simulation
         consciousness_scores = []

@@ -1,5 +1,6 @@
 import json
 import random
+import argparse
 import mlx.core as mx
 import numpy as np
 
@@ -54,57 +55,79 @@ def generate_conversation_data(filename="conversation_data.json"):
     
     print(f"✅ Generated {len(expanded_data)} conversation pairs.")
 
-def generate_synthetic_experiences(filename="synthetic_experiences.json", num_samples=1000):
+def generate_synthetic_data(num_experiences=1000, output_file="synthetic_experiences.json", balanced=False, oversample_boundary=False):
     """
-    Generates synthetic 'experiences' (State, Action, Reward, NextState)
-    to pre-train the agent's World Model and System 1.
+    Generates synthetic experiences where the optimal action depends on a simple rule.
+    Rule: If state[0] > 0, Action 0 is correct. If state[0] <= 0, Action 1 is correct.
     """
-    print(f"Generating {num_samples} synthetic experiences to {filename}...")
-    
+    print(f"Generating {num_experiences} synthetic experiences...")
     experiences = []
     
-    # We simulate a simple environment where:
-    # State is a 128D vector.
-    # Action is 0 or 1.
-    # Pattern: 
-    # - If state[0] > 0, Action 0 is optimal
-    # - If state[0] <= 0, Action 1 is optimal
-    
-    for _ in range(num_samples):
-        # Random state
+    count_action_0 = 0
+    count_action_1 = 0
+
+    for i in range(num_experiences):
+        # Create a random state vector (dim 128)
         state = np.random.randn(128).astype(np.float32)
         
-        # Determine optimal action
-        if state[0] > 0:
-            optimal_action = 0
-        else:
-            optimal_action = 1
-            
-        # Choose an action (mostly optimal to create a good dataset)
-        # We want to demonstrate Behavior Cloning (learning from expert data)
-        if random.random() < 0.9:
-            action = optimal_action
-            reward = 1.0
-        else:
-            # Suboptimal action
-            action = 1 - optimal_action
-            reward = -1.0
-            
-        # Simulate Next State
-        next_state = state + np.random.normal(0, 0.1, 128).astype(np.float32)
+        # Balanced Sampling Logic
+        if balanced:
+            # Force the decision variable (state[0]) to alternate or balance
+            if i % 2 == 0:
+                # Target Action 0 -> state[0] must be positive
+                state[0] = abs(np.random.randn()) + 0.1 
+            else:
+                # Target Action 1 -> state[0] must be negative
+                state[0] = -abs(np.random.randn()) - 0.1
+
+        # Boundary Oversampling Logic
+        if oversample_boundary:
+            # 20% of samples are very close to 0
+            if np.random.rand() < 0.2:
+                state[0] = state[0] * 0.1 # Shrink magnitude to be near boundary
+
+        # Determine correct action based on rule
+        # Rule: state[0] > 0 -> Action 0, else Action 1
+        correct_action = 0 if state[0] > 0 else 1
         
-        experiences.append({
+        if correct_action == 0:
+            count_action_0 += 1
+        else:
+            count_action_1 += 1
+
+        experience = {
             "state": state.tolist(),
-            "action": action,
-            "reward": reward,
-            "next_state": next_state.tolist()
-        })
-        
-    with open(filename, 'w') as f:
-        json.dump(experiences, f, indent=2)
-        
-    print(f"✅ Generated {num_samples} synthetic experiences.")
+            "action": correct_action,
+            "reward": 1.0, # High reward for correct action
+            "next_state": np.random.randn(128).tolist(), # Dummy next state
+            "done": False
+        }
+        experiences.append(experience)
+    
+    print(f"Generated {len(experiences)} experiences.")
+    print(f"Class Balance: Action 0: {count_action_0}, Action 1: {count_action_1}")
+    
+    with open(output_file, 'w') as f:
+        json.dump(experiences, f)
+    print(f"Saved to {output_file}")
 
 if __name__ == "__main__":
-    generate_conversation_data()
-    generate_synthetic_experiences()
+    parser = argparse.ArgumentParser(description="Generate training datasets for the MLX consciousness project")
+    parser.add_argument("--convo-file", type=str, default="conversation_data.json",
+                        help="Output path for conversation data JSON")
+    parser.add_argument("--experiences-file", type=str, default="synthetic_experiences.json",
+                        help="Output path for synthetic experiences JSON")
+    parser.add_argument("--num-samples", type=int, default=1000,
+                        help="Number of synthetic experiences to generate")
+    parser.add_argument("--no-convo", action="store_true",
+                        help="Skip generating conversation data")
+    parser.add_argument("--no-experiences", action="store_true",
+                        help="Skip generating synthetic experiences")
+    parser.add_argument("--balanced", action="store_true", help="Ensure 50/50 split of positive/negative examples")
+    parser.add_argument("--oversample-boundary", action="store_true", help="Generate more samples near the decision boundary")
+    args = parser.parse_args()
+
+    if not args.no_convo:
+        generate_conversation_data(filename=args.convo_file)
+    if not args.no_experiences:
+        generate_synthetic_data(num_experiences=args.num_samples, output_file=args.experiences_file, balanced=args.balanced, oversample_boundary=args.oversample_boundary)

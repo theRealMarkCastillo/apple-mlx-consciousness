@@ -13,13 +13,13 @@ class ConsciousChatbot:
     Now upgraded with Biological NLP (SDRs) and Multi-Modal Vision.
     """
     def __init__(self, use_heterogeneous: bool = False):
-        # State dim 128, Action dim 3 (0: Chit-chat, 1: Fact, 2: Question)
+        # State dim 128, Action dim 2 (binary classification from 50k dataset)
         self.use_heterogeneous = use_heterogeneous
         if use_heterogeneous:
             print("🚀 Initializing Heterogeneous Agent (NPU + GPU)...")
-            self.agent = HeterogeneousAgent(state_dim=128, action_dim=3)
+            self.agent = HeterogeneousAgent(state_dim=128, action_dim=2)
         else:
-            self.agent = BicameralAgent(state_dim=128, action_dim=3)
+            self.agent = BicameralAgent(state_dim=128, action_dim=2)
         
         # --- Biological Upgrades ---
         print("🧠 Initializing Biological NLP & Sensory Cortex...")
@@ -45,8 +45,8 @@ class ConsciousChatbot:
         if os.path.exists("long_term_memory.json"):
             self.associative_memory.load_memory("long_term_memory.json")
             
-        # Load persistent brain if available
-        if os.path.exists("agent_brain.npz"):
+        # Load persistent brain if available (only for HeterogeneousAgent)
+        if self.use_heterogeneous and os.path.exists("agent_brain.npz"):
             self.agent.load_brain("agent_brain.npz")
 
     def save_state(self):
@@ -57,9 +57,26 @@ class ConsciousChatbot:
             self.agent.save_brain("agent_brain.npz")
 
     def _populate_memory(self):
-        """Initialize the associative memory with basic concepts and loaded data."""
-        # 1. Load from JSON if available
+        """Initialize the associative memory with basic concepts and loaded data from 50k dataset."""
+        # 1. Load from 50k balanced dataset
         loaded_count = 0
+        if os.path.exists("synthetic_experiences_50k_balanced.json"):
+            try:
+                import json
+                with open("synthetic_experiences_50k_balanced.json", "r") as f:
+                    data = json.load(f)
+                    # Use first 100 samples for memory initialization
+                    for item in data[:100]:
+                        state_vec = mx.array(item["state"])
+                        action = item["action"]
+                        response = f"Action {action} decision based on state similarity"
+                        self.associative_memory.add(state_vec, response)
+                        loaded_count += 1
+                print(f"   Loaded {loaded_count} experiences from 50k balanced dataset.")
+            except Exception as e:
+                print(f"   Warning: Could not load 50k dataset: {e}")
+
+        # 2. Load conversation data if available
         if os.path.exists("conversation_data.json"):
             try:
                 import json
@@ -72,11 +89,11 @@ class ConsciousChatbot:
                         concept_vec = self.multimodal_fuser.text_proj(sdr)
                         self.associative_memory.add(concept_vec, response)
                         loaded_count += 1
-                print(f"   Loaded {loaded_count} conversation pairs from disk.")
+                print(f"   Loaded conversation pairs from disk.")
             except Exception as e:
                 print(f"   Warning: Could not load conversation_data.json: {e}")
 
-        # 2. Add hardcoded fallbacks if nothing loaded
+        # 3. Add hardcoded fallbacks if nothing loaded
         if loaded_count == 0:
             knowledge_base = [
                 ("hello hi greetings", "Hello! I am a conscious agent running on Apple Silicon."),

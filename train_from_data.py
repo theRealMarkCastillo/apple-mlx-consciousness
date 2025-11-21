@@ -1,9 +1,13 @@
 import json
+import argparse
+import os
 import mlx.core as mx
+import mlx.nn as nn
+import mlx.optimizers as optim
 import numpy as np
 from heterogeneous_architecture import HeterogeneousAgent
 
-def train_agent_from_file(filename="synthetic_experiences.json"):
+def train_agent_from_file(filename="synthetic_experiences.json", num_epochs: int = 5, sleep_epochs: int = 10, save_path: str = "agent_brain.npz", action_dim: int = 2, mode: str = "policy_gradient", defer_quantization: bool = False):
     """
     Demonstrates how to train an agent using offline data.
     """
@@ -21,46 +25,97 @@ def train_agent_from_file(filename="synthetic_experiences.json"):
     # Filter for positive experiences only (Behavioral Cloning)
     # Policy Gradient with negative rewards can be unstable (unbounded loss)
     # so we focus on learning "what to do" from successful examples.
-    experiences = [e for e in experiences if e['reward'] > 0]
-    print(f"Filtered to {len(experiences)} positive experiences for Behavioral Cloning.")
+    if mode == "policy_gradient":
+        experiences = [e for e in experiences if e['reward'] > 0]
+        print(f"Filtered to {len(experiences)} positive experiences for Behavioral Cloning (Policy Gradient).")
+    else:
+        print(f"Using all {len(experiences)} experiences for Supervised Learning.")
     
     # Initialize a fresh agent
     print("\nInitializing fresh Heterogeneous Agent...")
-    agent = HeterogeneousAgent(use_quantization=True)
+    # If defer_quantization is True, we start with full precision for better training stability
+    use_quantization = not defer_quantization
+    agent = HeterogeneousAgent(state_dim=128, action_dim=action_dim, use_quantization=use_quantization)
     
+    if defer_quantization:
+        print("⚠️ Quantization deferred until after training (using FP32 for training).")
+
     # Pre-load the buffer
     # In a real scenario, we might batch this differently, but here we just fill the buffer
     # The agent's buffer has a max size, so we might need to sleep multiple times
     
-    batch_size = agent.max_online_buffer
+    batch_size = 100 # Fixed batch size for supervised training
+    if mode == "policy_gradient":
+        batch_size = agent.max_online_buffer
+
     num_batches = len(experiences) // batch_size
     
+    # Optimizer for supervised learning
+    optimizer = optim.Adam(learning_rate=0.001)
+
     # Loop over the dataset multiple times (Epochs)
-    num_epochs = 5
-    print(f"\nTraining for {num_epochs} epochs over the dataset...")
+    print(f"\nTraining for {num_epochs} epochs over the dataset (Mode: {mode})...")
     
     for epoch in range(num_epochs):
         print(f"\n--- Epoch {epoch+1}/{num_epochs} ---")
         # Shuffle experiences
         np.random.shuffle(experiences)
         
+        epoch_loss = 0
+        
         for i in range(num_batches):
             start_idx = i * batch_size
             end_idx = min((i + 1) * batch_size, len(experiences))
             
             batch = experiences[start_idx:end_idx]
-            agent.online_buffer = batch
             
-            # Train
-            stats = agent.sleep(epochs=10) # Increased internal epochs
+            if mode == "policy_gradient":
+                agent.online_buffer = batch
+                # Train using internal sleep mechanism
+                stats = agent.sleep(epochs=sleep_epochs)
+                if i % 5 == 0:
+                    print(f"   Batch {i+1}: Loss {stats['initial_loss']:.4f} -> {stats['final_loss']:.4f}")
             
-            if i % 5 == 0:
-                print(f"   Batch {i+1}: Loss {stats['initial_loss']:.4f} -> {stats['final_loss']:.4f}")
+            elif mode == "supervised":
+                # Prepare batch data
+                states = mx.array([e['state'] for e in batch])
+                actions = mx.array([e['action'] for e in batch])
+                
+                # Define loss function (Cross Entropy)
+                def loss_fn(model):
+                    # Forward pass to get logits (accessing internal layers of System 1)
+                    x = mx.tanh(model.l1(states))
+                    logits = model.l2(x)
+                    return mx.mean(nn.losses.cross_entropy(logits, actions))
+                
+                # Training step
+                loss_and_grad_fn = nn.value_and_grad(agent.system1, loss_fn)
+                loss, grads = loss_and_grad_fn(agent.system1)
+                optimizer.update(agent.system1, grads)
+                
+                # Force evaluation
+                mx.eval(agent.system1.parameters(), optimizer.state)
+                
+                epoch_loss += loss.item()
+                
+                if i % 20 == 0:
+                    print(f"   Batch {i+1}/{num_batches}: Loss {loss.item():.4f}")
+
+        if mode == "supervised":
+            print(f"   Average Epoch Loss: {epoch_loss / num_batches:.4f}")
                 
     print(f"\n✅ Training Complete.")
     
+    # Apply quantization if it was deferred
+    if defer_quantization:
+        print("Applying deferred quantization...")
+        agent.system1.quantize_weights(force=True)
+        agent.use_quantization = True
+    
     # Save the trained brain
-    agent.save_brain("agent_brain.npz")
+    agent.save_brain(save_path)
+    if os.path.exists(save_path):
+        print(f"Saved brain file size: {os.path.getsize(save_path)} bytes")
     
     # Evaluation
     print("\nEvaluating learned behavior...")
@@ -98,4 +153,14 @@ def train_agent_from_file(filename="synthetic_experiences.json"):
     print(f"\nAccuracy: {correct}/{len(test_cases)} ({correct/len(test_cases)*100:.1f}%)")
 
 if __name__ == "__main__":
-    train_agent_from_file()
+    parser = argparse.ArgumentParser(description="Offline training from synthetic experiences")
+    parser.add_argument("--file", type=str, default="synthetic_experiences.json", help="Path to experiences JSON file")
+    parser.add_argument("--epochs", type=int, default=5, help="Number of epochs over dataset")
+    parser.add_argument("--sleep-epochs", type=int, default=10, help="Sleep() training epochs per batch")
+    parser.add_argument("--save", type=str, default="agent_brain.npz", help="Output path for trained brain weights")
+    parser.add_argument("--action-dim", type=int, default=2, help="Action dimension for agent (default 2 for this dataset)")
+    parser.add_argument("--mode", type=str, default="policy_gradient", choices=["policy_gradient", "supervised"], help="Training mode")
+    parser.add_argument("--defer-quantization", action="store_true", help="Train in FP32 and quantize after")
+    args = parser.parse_args()
+
+    train_agent_from_file(filename=args.file, num_epochs=args.epochs, sleep_epochs=args.sleep_epochs, save_path=args.save, action_dim=args.action_dim, mode=args.mode, defer_quantization=args.defer_quantization)

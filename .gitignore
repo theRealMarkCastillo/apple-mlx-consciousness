@@ -42,12 +42,12 @@ htmlcov/
 # If you later add datasets or outputs you want ignored, append them below.
 # Generated Data & Memory
 conversation_data.json
-synthetic_experiences.json
-synthetic_experiences_*.json
+synthetic_experiences*.json
 long_term_memory.json
 swarm_collective_memory.json
-phase_transition_results.json
 episodic_memory.json
+*_memory*.json
+phase_transition_results.json
 
 # Model Weights (Binary)
 *.npz

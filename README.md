@@ -26,6 +26,12 @@ For concise, command-only instructions see **[`QUICKSTART.md`](QUICKSTART.md)**.
 
 This project implements a **Bicameral Agent** architecture inspired by dual-process theory and Global Workspace Theory.
 
+### 📖 Understanding the System
+
+- **[`THEORY_AND_IMPLEMENTATION.md`](THEORY_AND_IMPLEMENTATION.md)** - Complete guide to the cognitive science theories underpinning this project and how each is implemented in code
+- **[`ARCHITECTURE.md`](ARCHITECTURE.md)** - Technical architecture with system diagrams and component interactions
+- **[`COLLECTIVE_CONSCIOUSNESS.md`](COLLECTIVE_CONSCIOUSNESS.md)** - Deep dive into multi-agent swarm mechanics and collective intelligence
+
 ### Core Components
 *   **`BicameralAgent`**: The fundamental cognitive unit, featuring:
     *   **System 1**: Fast, intuitive, reactive processing.

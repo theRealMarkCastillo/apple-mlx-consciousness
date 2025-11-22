@@ -57,7 +57,7 @@ class GlobalWorkspace:
 
 ### Architectural Implementation
 
-We implement both systems explicitly:
+We implement both systems explicitly, with **Hebbian Fast Weights** for System 1:
 
 ```python
 # From cognitive_architecture.py
@@ -67,26 +67,29 @@ class System1(nn.Module):
         super().__init__()
         self.l1 = nn.Linear(input_dim, hidden_dim)
         self.l2 = nn.Linear(hidden_dim, output_dim)
+        
+        # Hebbian Fast Weights (Hidden -> Output)
+        # These run in parallel to l2 and update instantly
+        self.hebbian_weights = mx.zeros((output_dim, hidden_dim))
     
     def __call__(self, x):
-        x = nn.relu(self.l1(x))
-        logits = self.l2(x)  # Rapid proposal
-        return logits
-
-class System2(nn.Module):
-    """Slow, deliberate, conscious monitor."""
-    def __init__(self, input_dim: int, hidden_dim: int, goal_dim: int):
-        super().__init__()
-        self.l1 = nn.Linear(input_dim, hidden_dim)
-        self.l_score = nn.Linear(hidden_dim, 1)      # Confidence evaluation
-        self.l_goal = nn.Linear(hidden_dim, goal_dim)  # Goal-setting
-    
-    def __call__(self, x):
-        x = mx.tanh(self.l1(x))
-        score = mx.sigmoid(self.l_score(x))  # "Do I trust System 1?"
-        goal = mx.tanh(self.l_goal(x))       # "What should we focus on?"
-        return score, goal
+        h = nn.relu(self.l1(x))
+        
+        # Slow path (Standard Weights)
+        logits_slow = self.l2(h)
+        
+        # Fast path (Hebbian Weights)
+        logits_fast = self.hebbian_weights @ h
+        
+        return logits_slow + logits_fast, h
 ```
+
+**Why this design:**
+*   **Standard Weights:** Learn slowly via gradient descent (long-term memory).
+*   **Hebbian Weights:** Learn instantly via associative plasticity (short-term memory).
+*   This enables **One-Shot Learning**—the agent can learn to avoid a danger after a single exposure.
+
+---
 
 ### Hardware Mapping (Heterogeneous Implementation)
 
@@ -356,16 +359,51 @@ class BicameralAgent:
 
 ---
 
+## 7. Intrinsic Motivation & Curiosity
+
+### The Theory
+
+Biological agents don't just wait for external rewards. They are **intrinsically motivated** to explore and understand their environment.
+
+*   **Curiosity:** The drive to reduce uncertainty.
+*   **Surprise:** The difference between what was predicted and what actually happened.
+
+### Architectural Implementation
+
+```python
+# From cognitive_architecture.py
+def step(self, sensory_input, reward):
+    # ...
+    # Predict what SHOULD happen (World Model)
+    predicted_next_state = self.world_model(self.last_state, self.last_action)
+    
+    # Calculate "Surprise" (Prediction Error)
+    surprise = mx.mean((predicted_next_state - current_state) ** 2).item()
+    
+    # Intrinsic Reward: The agent gets a dopamine hit for learning something new
+    intrinsic_reward = surprise * 5.0 
+    total_reward = reward + intrinsic_reward
+    # ...
+```
+
+**Design Rationale:**
+*   The agent is rewarded for finding **novel** states where its world model fails.
+*   This drives autonomous exploration without needing hand-crafted reward functions.
+
+---
+
 ## Summary: Theory to Architecture Mapping
 
 | Theory | Key Insight | Architecture | File |
 |--------|------------|--------------|------|
 | **Global Workspace** | Consciousness = broadcasting to all systems | 128D state vector with history | `cognitive_architecture.py` |
 | **Dual-Process** | Two modes of cognition; separate hardware | System 1 (NPU) + System 2 (GPU) | `heterogeneous_architecture.py` |
+| **Hebbian Learning** | Neurons wire together instantly | Fast weights matrix in System 1 | `cognitive_architecture.py` |
 | **IIT (Φ)** | Consciousness is measurable integration | Entropy + cross-system divergence | `consciousness_metrics.py` |
 | **SDR** | Brain represents concepts sparsely | Binary vectors, hamming distance | `biological_nlp.py` |
 | **Collective Mind** | Group emerges from individual interaction | Shared workspace + unified memory | `swarm_architecture.py` |
 | **Bicameralism** | Consciousness is internal dialogue | System 1 ↔ System 2 ↔ Workspace | `cognitive_architecture.py` |
+| **Active Inference** | Brain minimizes surprise | Intrinsic motivation (Curiosity) | `cognitive_architecture.py` |
 
 ---
 

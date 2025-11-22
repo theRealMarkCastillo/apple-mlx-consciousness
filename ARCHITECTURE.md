@@ -51,9 +51,12 @@ The core cognitive unit is the `BicameralAgent`. It implements a dual-process th
 
 *   **Global Workspace:** A persistent state vector that integrates sensory input, memory, and top-down attention. It represents the agent's "stream of consciousness."
 *   **System 1 (Intuition):** A fast, feed-forward neural network that proposes actions based on the current workspace state. It is reactive and heuristic.
+    *   **Hebbian Fast Weights:** A parallel "fast lane" in System 1 that updates instantly (one-shot learning) based on recent activity, decaying over time.
 *   **System 2 (Reflection):** A slower, monitoring network. It evaluates the confidence of System 1's proposals. If confidence is low, it intervenes by triggering memory recall or imagination.
 *   **World Model:** A predictive model that simulates the outcome of actions ("Imagination").
 *   **Episodic Memory:** A content-addressable storage system for past experiences.
+    *   **Prioritized Experience Replay:** Memories are stored with a "surprise" score. During dreaming, high-surprise events are replayed more frequently.
+*   **Intrinsic Motivation (Curiosity):** The agent generates its own internal rewards based on prediction error (surprise), driving it to explore unknown states.
 
 ### Cognitive Cycle Diagram
 
@@ -136,4 +139,8 @@ graph LR
 *   **Framework:** Apple MLX (optimized for M-series chips)
 *   **State Space:** 128-dimensional floating point vectors.
 *   **Memory:** Vectorized cosine similarity search (GPU-accelerated).
-*   **Plasticity:** Online learning via Adam optimizer updates to System 1 and World Model weights.
+*   **Plasticity:** 
+    *   **Online:** Adam optimizer (System 1 & World Model) + Hebbian Fast Weights (System 1).
+    *   **Offline:** Prioritized Experience Replay (Dreaming).
+
+````

@@ -7,8 +7,8 @@ def run_simulation(steps=20):
     agent = BicameralAgent(state_dim=128, action_dim=5)
     
     print(f"🚀 Starting Stream of Consciousness Simulation ({steps} steps)...\n")
-    print(f"{'STEP':<5} | {'ACTION':<8} | {'CONFIDENCE':<12} | {'ENTROPY':<10} | {'INTERVENTION'}")
-    print("-" * 65)
+    print(f"{'STEP':<5} | {'ACTION':<8} | {'CONFIDENCE':<12} | {'SURPRISE':<10} | {'ENTROPY':<10} | {'INTERVENTION'}")
+    print("-" * 80)
 
     history = []
 
@@ -32,8 +32,9 @@ def run_simulation(steps=20):
         
         conf = decision['confidence'].item()
         ent = decision['entropy'].item()
+        surp = decision['surprise']
         
-        print(f"{t+1:<5} | {decision['action']:<8} | {conf:.4f}       | {ent:.4f}     | {intervention_mark}")
+        print(f"{t+1:<5} | {decision['action']:<8} | {conf:.4f}       | {surp:.4f}     | {ent:.4f}     | {intervention_mark}")
         
         history.append(decision)
         

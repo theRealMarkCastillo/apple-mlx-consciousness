@@ -31,11 +31,20 @@ A theory by Jeff Hawkins (Numenta) stating that the brain represents information
 ### Collective Consciousness
 In this project, the emergent intelligence arising from a swarm of agents sharing a single **Collective Workspace** and **Unified Memory Pool**. It allows individual agents to access the "group mind."
 
+### Hebbian Learning
+A biological learning rule often summarized as "neurons that fire together, wire together." In our system, we implement **Hebbian Fast Weights** that update instantly based on activity, allowing for one-shot learning (unlike standard gradient descent which requires many repetitions).
+
 ### Heterogeneous Compute
 Using different types of processors for different tasks. We use the **Neural Engine (NPU)** for System 1 (fast, efficient) and the **GPU** for System 2 (complex, flexible).
 
+### Intrinsic Motivation (Curiosity)
+A drive for the agent to explore its environment based on internal signals rather than external rewards. We implement this by treating **Surprise** (prediction error) as a positive reward, encouraging the agent to seek out novel situations.
+
 ### Latent Space / State Vector
 A mathematical representation of the agent's internal state. In our system, the "stream of consciousness" is a 128-dimensional vector evolving over time.
+
+### Prioritized Experience Replay
+An enhancement to the dreaming process where memories are not sampled randomly. Instead, memories with high **Surprise** (prediction error) are replayed more frequently. This ensures the agent focuses its learning on its biggest mistakes.
 
 ### Quantization
 The process of reducing the precision of a neural network's weights (e.g., from 16-bit floating point to 8-bit integers). We use this to make System 1 ultra-fast and memory-efficient on the NPU.

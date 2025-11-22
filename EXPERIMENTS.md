@@ -33,8 +33,8 @@ sensory_input = mx.random.normal((32,)) * 2.0
 
 ---
 
-## Experiment 2: The Benefit of Dreaming
-**Hypothesis:** "Dreaming" (offline training) significantly reduces the agent's surprise (prediction error) when facing the world.
+## Experiment 2: The Benefit of Dreaming (Prioritized Replay)
+**Hypothesis:** "Dreaming" (offline training) significantly reduces the agent's surprise (prediction error) when facing the world. Prioritized Replay should make this process faster by focusing on hard examples.
 
 ### Setup
 1. Open `02_Learning_and_Dreaming.ipynb`.
@@ -42,7 +42,7 @@ sensory_input = mx.random.normal((32,)) * 2.0
 
 ### Procedure
 1. Run the "Pre-Sleep" simulation and note the **World Model MSE** (Mean Squared Error).
-2. Run the "Dreaming" cell (try increasing `epochs` from 5 to 20).
+2. Run the "Dreaming" cell. The agent will automatically prioritize high-surprise memories.
 3. Run the "Post-Sleep" simulation.
 
 ### What to Observe
@@ -51,7 +51,25 @@ sensory_input = mx.random.normal((32,)) * 2.0
 
 ---
 
-## Experiment 3: Swarm Consensus Speed
+## Experiment 3: Curiosity vs. Boredom
+**Hypothesis:** An agent with Intrinsic Motivation (Curiosity) will explore the environment more thoroughly than a random agent.
+
+### Setup
+1. Open `simulation.py`.
+2. Observe the `SURPRISE` column in the output.
+
+### Procedure
+1. Run the simulation.
+2. Watch how the `SURPRISE` value changes over time.
+
+### What to Observe
+*   Initially, `SURPRISE` should be high (everything is new).
+*   As the agent learns, `SURPRISE` should drop.
+*   **Expected Result:** If the agent gets "bored" (low surprise), it might change its behavior to find new patterns (if the environment allows).
+
+---
+
+## Experiment 4: Swarm Consensus Speed
 **Hypothesis:** Larger swarms take longer to reach consensus, but the consensus is more stable.
 
 ### Setup

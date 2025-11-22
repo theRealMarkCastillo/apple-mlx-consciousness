@@ -75,7 +75,7 @@ This project implements a **Bicameral Agent** architecture inspired by dual-proc
 
 | File | Description | Status |
 |------|-------------|--------|
-| **`cognitive_architecture.py`** | Complete implementation (417 lines) with all cognitive modules | ✅ Phase 1 Complete |
+| **`cognitive_architecture.py`** | Complete implementation (417 lines) with Curiosity, Hebbian Learning, and Prioritized Replay | ✅ Phase 1 & 5 Complete |
 | **`swarm_architecture.py`** | Multi-agent system (407 lines) - collective consciousness at scale | ✅ Phase 2 Complete |
 | **`heterogeneous_architecture.py`** | GPU-NPU heterogeneous compute - 3.2× memory compression | ✅ Phase 4 Complete |
 | **`sensory_cortex.py`** | VisualCortex + MultiModalFuser (CLIP-like alignment) | ✅ Phase 5 Extension |
@@ -207,7 +207,8 @@ See **[ROADMAP.md](ROADMAP.md)** for detailed timeline.
 - ✅ Capacity increase: 949→3,039 agents (64GB)
 
 ### 🔮 Phase 5: Hardware-Aware / Multimodal Innovations (COMPLETED)
-- ✅ **Wake-Sleep Active Learning**
+- ✅ **Wake-Sleep Active Learning** (Prioritized Experience Replay)
+- ✅ **Intrinsic Motivation** (Curiosity-driven learning)
 - ✅ **Adversarial Co-Evolution**
 - ✅ **Sparse Memory Scaling** (20x capacity)
 

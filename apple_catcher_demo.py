@@ -207,17 +207,43 @@ def run_demo():
         nonlocal frame_count, phase_switched, prev_reward, last_x, stuck_frames
         frame_count += 1
         
-        # Living Cost: It costs energy to exist. 
-        # This ensures the agent never gets 0.0 reward for doing nothing.
-        # It forces the agent to seek positive rewards to offset this cost.
-        prev_reward -= 0.01
-        
         # 1. AI Step
         state = game.get_state()
         
-        # Pass the reward from the PREVIOUS frame so the agent can learn from the transition
+        # Stuck Detector: If we haven't moved horizontally for 20 frames, force a random move
+        # This breaks "local minima" where the agent is content doing nothing
+        if game.player_x == last_x:
+            stuck_frames += 1
+        else:
+            stuck_frames = 0
+            last_x = game.player_x
+            
+        force_random = False
+        if stuck_frames > 20:
+            force_random = True
+            stuck_frames = 0 # Reset
+        
+        # Pass the reward from the PREVIOUS frame
         decision = agent.step(state, reward=prev_reward) 
-        action = decision['action']
+        
+        if force_random:
+            # Override brain to break loop
+            action = random.choice([0, 2]) # Force Left or Right (not stay)
+            
+            # CRITICAL: Tell the agent we overrode its decision!
+            # Otherwise it thinks it decided to 'Stay' but sees the world move, causing confusion.
+            action_vec = mx.zeros((agent.action_dim,))
+            action_vec[action] = 1.0
+            agent.last_action = action_vec
+            
+            # Visual feedback
+            rule_text.set_text("⚠️ STUCK DETECTED: FORCING MOVE ⚠️")
+        else:
+            action = decision['action']
+            if not phase_switched:
+                rule_text.set_text("RULE: RED IS GOOD")
+            else:
+                rule_text.set_text("⚠️ RULE CHANGE: GREEN IS GOOD! ⚠️")
         
         # --- Hardware Simulation ---
         # NPU (System 1) is always active for inference (Fast)
@@ -247,10 +273,6 @@ def run_demo():
             hardware_bars[1].set_color('red') # Heavy Load
         else:
             hardware_bars[1].set_color('orange') # Idle/Low
-        
-        # REMOVED EXTERNAL STUCK DETECTOR
-        # We now rely on the agent's internal "Reality Check" (Temperature Scaling)
-        # to break out of loops. External overrides confuse the learning process.
         
         # 2. Game Step
         reward = game.step(action)

@@ -41,12 +41,14 @@ class EpisodicMemory:
         # Now append consistently
         self.memories.append(episode)
         
-        # Update GPU memory matrix - always rebuild to avoid concatenation bugs
-        states = [mx.array(m["state"]) for m in self.memories]
-        self.memory_matrix = mx.stack(states) if states else None
+        # Update GPU memory matrix efficiently
+        if self.memory_matrix is None:
+            self.memory_matrix = state[None, :]
+        else:
+            self.memory_matrix = mx.concatenate([self.memory_matrix, state[None, :]], axis=0)
 
-        # Auto-save every 10 memories for persistence during debug
-        if len(self.memories) % 10 == 0:
+        # Auto-save every 1000 memories to avoid disk thrashing
+        if len(self.memories) % 1000 == 0:
             self.save_memories()
 
     def retrieve(self, query_state: mx.array, k: int = 3):

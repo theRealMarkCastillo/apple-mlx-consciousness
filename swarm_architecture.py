@@ -247,7 +247,8 @@ class ConsciousSwarm:
     - Total active memory: ~53 KB (fits in L2 cache!)
     """
     def __init__(self, num_agents: int = 100, agent_state_dim: int = 128, 
-                 collective_dim: int = 512, action_dim: int = 10):
+                 collective_dim: int = 512, action_dim: int = 10,
+                 memory_file: str = "swarm_collective_memory.json"):
         self.num_agents = num_agents
         self.agent_state_dim = agent_state_dim
         self.collective_dim = collective_dim
@@ -262,7 +263,7 @@ class ConsciousSwarm:
         
         # Shared infrastructure
         self.collective_workspace = CollectiveWorkspace(collective_dim, num_agents)
-        self.shared_memory = SharedMemoryPool(state_dim=agent_state_dim)
+        self.shared_memory = SharedMemoryPool(memory_file=memory_file, state_dim=agent_state_dim)
         self.communication = AgentCommunication(num_agents)
         
         # Swarm-level metrics
